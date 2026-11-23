@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <RootNamespace>NexBot.App</RootNamespace>
+    <AssemblyName>NexBot</AssemblyName>
+    <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
+    <ApplicationVisualStyles>true</ApplicationVisualStyles>
+    <!-- WinForms + SqlClient-free app: keep culture data for the ANSI code pages of packet strings. -->
+    <InvariantGlobalization>false</InvariantGlobalization>
+    <!-- The UI is built in code (no designer): no designer serialization attributes needed. -->
+    <NoWarn>$(NoWarn);WFO1000;CA1859</NoWarn>
+    <ApplicationIcon>Assets\app.ico</ApplicationIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- The designer adds an empty resx for the partial MainForm.Layout.cs; it would clash with MainForm.resx. -->
+    <EmbeddedResource Remove="MainForm.Layout.resx" />
+    <!-- Cinzel (SIL Open Font License, see Assets/Cinzel-OFL.txt) for the titles. -->
+    <EmbeddedResource Include="Assets\Cinzel-Bold.ttf" LogicalName="NexBot.App.Assets.Cinzel-Bold.ttf" />
+    <EmbeddedResource Include="Assets\Cinzel-SemiBold.ttf" LogicalName="NexBot.App.Assets.Cinzel-SemiBold.ttf" />
+    <None Include="Assets\Cinzel-OFL.txt" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\NexBot.Core\NexBot.Core.csproj" />
+  </ItemGroup>
+
+</Project>

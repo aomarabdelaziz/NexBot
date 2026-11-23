@@ -1,0 +1,17 @@
+<Project>
+  <!-- Shared settings for every project in the solution. -->
+  <PropertyGroup>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AnalysisLevel>latest-recommended</AnalysisLevel>
+    <Deterministic>true</Deterministic>
+    <!-- The game client is 32-bit; the loader patches it in place, so the bot runs as a 32-bit process too. -->
+    <PlatformTarget>x86</PlatformTarget>
+    <!-- Domain names and protocol field names intentionally break a few naming rules. -->
+    <NoWarn>$(NoWarn);CA1707;CA1716;CA1720;CA1724;CA1028;CA1008;CA1027;CA1031;CA1062;CA1303;CA1305;CA1307;CA1309;CA1310;CA1819;CA1848;CA1873;CA2007;CA5394;CA1711;CA1002;CA1051;CA1034;CA1815;CA1003;CA1805;CA1401;CA2101</NoWarn>
+    <Authors>NexBot</Authors>
+    <Product>NexBot</Product>
+    <Version>0.1.0</Version>
+  </PropertyGroup>
+</Project>

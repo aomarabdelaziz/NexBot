@@ -1,0 +1,9 @@
+bin/
+obj/
+.vs/
+*.user
+settings.json
+settings.json.broken
+Database.sqlite3
+TestResults/
+changelog.md

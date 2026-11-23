@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <IsPackable>false</IsPackable>
+    <Nullable>disable</Nullable>
+    <!-- Legacy/ is an unmodified copy of the original SilkroadSecurityApi, used as a test oracle. -->
+    <NoWarn>$(NoWarn);CS0168;CS0219;CS0414;CS0649;CA1822;CA1825;CA1852;CA2211;CA1018;CA1001;CA1305;CA1513;CA1510;CA2201;CA1859;CA1861;CA2263;CA1847;CA1866;CA1865;CA1846;CA1854;CA1869;IDE0005;SYSLIB0001;CA1834;CA1872</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\NexBot.Core\NexBot.Core.csproj" />
+  </ItemGroup>
+
+</Project>

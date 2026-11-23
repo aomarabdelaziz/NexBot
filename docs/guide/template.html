@@ -1,0 +1,1164 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NexBot Guide</title>
+<style>
+:root {
+  --bg: #ffffff; --bg-soft: #f7f6f3; --bg-side: #fbfaf8; --line: #e7e3da; --text: #1f1d1a; --muted: #6b665c;
+  --accent: #a8741a; --accent-soft: #f6ecd8; --link: #8a5d0f; --code-bg: #f3f1ec;
+  --info: #2f6fb3; --info-bg: #eaf2fb; --warn: #a0620a; --warn-bg: #fdf3e2; --ok: #2e7d4f; --ok-bg: #e8f5ed; --bad: #b23b3b; --bad-bg: #fbeaea;
+  --shadow: 0 1px 2px rgba(0,0,0,.06), 0 4px 18px rgba(0,0,0,.06);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #15130f; --bg-soft: #1d1a15; --bg-side: #181611; --line: #2f2a21; --text: #ebe6dc; --muted: #a39b8b;
+    --accent: #d9a441; --accent-soft: #2c2415; --link: #e0b25a; --code-bg: #221f19;
+    --info: #79aee6; --info-bg: #17222f; --warn: #e3a44a; --warn-bg: #2a2114; --ok: #6cc391; --ok-bg: #15261c; --bad: #e27b7b; --bad-bg: #2c1717;
+    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 4px 18px rgba(0,0,0,.35);
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #15130f; --bg-soft: #1d1a15; --bg-side: #181611; --line: #2f2a21; --text: #ebe6dc; --muted: #a39b8b;
+  --accent: #d9a441; --accent-soft: #2c2415; --link: #e0b25a; --code-bg: #221f19;
+  --info: #79aee6; --info-bg: #17222f; --warn: #e3a44a; --warn-bg: #2a2114; --ok: #6cc391; --ok-bg: #15261c; --bad: #e27b7b; --bad-bg: #2c1717;
+  --shadow: 0 1px 2px rgba(0,0,0,.4), 0 4px 18px rgba(0,0,0,.35);
+}
+* { box-sizing: border-box; }
+html { scroll-padding-top: 76px; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.65 -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+a { color: var(--link); text-decoration: none; }
+a:hover { text-decoration: underline; }
+code { font-family: Consolas, "Cascadia Mono", Menlo, monospace; font-size: .88em; background: var(--code-bg); padding: .1em .35em; border-radius: 4px; border: 1px solid var(--line); }
+pre { background: var(--code-bg); border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; overflow-x: auto; line-height: 1.5; }
+pre code { background: none; border: 0; padding: 0; font-size: .86em; }
+kbd { font-family: inherit; font-size: .85em; border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 4px; padding: 0 .4em; background: var(--bg-soft); }
+
+/* Top bar */
+.top { position: sticky; top: 0; z-index: 20; height: 60px; display: flex; align-items: center; gap: 16px; padding: 0 20px; background: var(--bg); border-bottom: 1px solid var(--line); }
+.brand { display: flex; align-items: center; gap: 10px; font-weight: 700; letter-spacing: .02em; color: var(--text); white-space: nowrap; }
+.brand .mark { width: 30px; height: 30px; border-radius: 7px; background: linear-gradient(135deg, #d9a441, #8a5d0f); display: grid; place-items: center; color: #1b1408; font-weight: 800; font-size: 15px; }
+.brand small { font-weight: 500; color: var(--muted); }
+.search { flex: 1; min-width: 0; max-width: 420px; margin-left: auto; position: relative; }
+.search input { width: 100%; height: 36px; border-radius: 8px; border: 1px solid var(--line); background: var(--bg-soft); color: var(--text); padding: 0 12px 0 34px; font: inherit; font-size: 14px; }
+.search input:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
+.search svg { position: absolute; left: 10px; top: 10px; width: 16px; height: 16px; color: var(--muted); }
+.results { position: absolute; top: 42px; left: 0; right: 0; background: var(--bg); border: 1px solid var(--line); border-radius: 10px; box-shadow: var(--shadow); max-height: 60vh; overflow-y: auto; display: none; }
+.results a { display: block; padding: 9px 14px; border-bottom: 1px solid var(--line); color: var(--text); font-size: 14px; }
+.results a:last-child { border-bottom: 0; }
+.results a:hover, .results a.on { background: var(--accent-soft); text-decoration: none; }
+.results a span { display: block; color: var(--muted); font-size: 12.5px; }
+.icon-btn { width: 36px; height: 36px; border-radius: 8px; border: 1px solid var(--line); background: var(--bg-soft); color: var(--text); display: grid; place-items: center; cursor: pointer; flex: none; }
+.icon-btn svg { width: 18px; height: 18px; }
+.menu-btn { display: none; }
+
+/* Layout */
+.wrap { display: grid; grid-template-columns: 270px minmax(0, 1fr) 220px; max-width: 1440px; margin: 0 auto; }
+nav.side { position: sticky; top: 60px; height: calc(100vh - 60px); overflow-y: auto; padding: 20px 14px 40px; border-right: 1px solid var(--line); background: var(--bg-side); }
+nav.side h4 { margin: 18px 10px 6px; font-size: 11.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+nav.side h4:first-child { margin-top: 0; }
+nav.side a { display: flex; align-items: center; gap: 9px; padding: 6px 10px; border-radius: 7px; color: var(--text); font-size: 14.5px; }
+nav.side a:hover { background: var(--bg-soft); text-decoration: none; }
+nav.side a.on { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+nav.side a .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--line); flex: none; }
+nav.side a.on .dot { background: var(--accent); }
+main { padding: 36px 56px 80px; min-width: 0; }
+aside.toc { position: sticky; top: 60px; height: calc(100vh - 60px); overflow-y: auto; padding: 36px 18px; font-size: 13.5px; }
+aside.toc h5 { margin: 0 0 10px; font-size: 11.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+aside.toc a { display: block; padding: 4px 0 4px 12px; border-left: 2px solid var(--line); color: var(--muted); }
+aside.toc a:hover { color: var(--text); text-decoration: none; }
+aside.toc a.on { color: var(--accent); border-left-color: var(--accent); }
+
+/* Content */
+section.page { display: none; max-width: 820px; }
+section.page.on { display: block; }
+.crumb { font-size: 13px; color: var(--accent); font-weight: 600; letter-spacing: .02em; margin-bottom: 6px; }
+h1 { font-size: 2.1rem; line-height: 1.2; margin: 0 0 10px; letter-spacing: -.01em; }
+.lead { font-size: 1.12rem; color: var(--muted); margin: 0 0 28px; }
+h2 { font-size: 1.45rem; margin: 40px 0 12px; padding-top: 8px; border-top: 1px solid var(--line); padding-top: 26px; }
+h3 { font-size: 1.12rem; margin: 28px 0 8px; }
+h2 a.anchor, h3 a.anchor { opacity: 0; margin-left: 8px; color: var(--muted); font-weight: 400; }
+h2:hover a.anchor, h3:hover a.anchor { opacity: 1; text-decoration: none; }
+p, ul, ol { margin: 0 0 14px; }
+li { margin: 4px 0; }
+figure { margin: 22px 0 28px; }
+figure img { width: 100%; height: auto; display: block; border-radius: 10px; border: 1px solid var(--line); box-shadow: var(--shadow); cursor: zoom-in; background: #0d0b08; }
+figcaption { font-size: 13.5px; color: var(--muted); text-align: center; margin-top: 8px; }
+table { width: 100%; border-collapse: collapse; margin: 10px 0 20px; font-size: 14.5px; display: block; overflow-x: auto; }
+thead, tbody { display: table; width: 100%; border-collapse: collapse; }
+th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: 12.5px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); background: var(--bg-soft); }
+td:first-child { font-weight: 600; white-space: nowrap; }
+.hint { display: flex; gap: 12px; padding: 13px 16px; border-radius: 9px; margin: 16px 0 20px; border: 1px solid; font-size: 15px; }
+.hint p:last-child, .hint ul:last-child { margin-bottom: 0; }
+.hint .ic { flex: none; width: 20px; height: 20px; margin-top: 2px; }
+.hint.info { background: var(--info-bg); border-color: color-mix(in srgb, var(--info) 30%, transparent); }
+.hint.info .ic { color: var(--info); }
+.hint.warn { background: var(--warn-bg); border-color: color-mix(in srgb, var(--warn) 30%, transparent); }
+.hint.warn .ic { color: var(--warn); }
+.hint.ok { background: var(--ok-bg); border-color: color-mix(in srgb, var(--ok) 30%, transparent); }
+.hint.ok .ic { color: var(--ok); }
+.hint.bad { background: var(--bad-bg); border-color: color-mix(in srgb, var(--bad) 30%, transparent); }
+.hint.bad .ic { color: var(--bad); }
+.steps { counter-reset: step; list-style: none; padding: 0; }
+.steps > li { position: relative; padding: 2px 0 14px 46px; margin: 0; border-left: 2px solid var(--line); margin-left: 15px; padding-left: 30px; }
+.steps > li:last-child { border-left-color: transparent; }
+.steps > li::before { counter-increment: step; content: counter(step); position: absolute; left: -16px; top: 0; width: 30px; height: 30px; border-radius: 50%; background: var(--accent); color: #1b1408; font-weight: 700; font-size: 14px; display: grid; place-items: center; }
+.steps > li > strong:first-child { display: block; margin-bottom: 2px; }
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; margin: 16px 0 24px; }
+.card { display: block; border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; background: var(--bg-soft); color: var(--text); }
+.card:hover { border-color: var(--accent); text-decoration: none; }
+.card b { display: block; margin-bottom: 2px; }
+.card span { font-size: 13.5px; color: var(--muted); }
+.tag { display: inline-block; font-size: 11.5px; font-weight: 700; letter-spacing: .04em; padding: 1px 8px; border-radius: 99px; vertical-align: 2px; margin-left: 6px; }
+.tag.soon { background: var(--warn-bg); color: var(--warn); border: 1px solid color-mix(in srgb, var(--warn) 35%, transparent); }
+.tag.new { background: var(--ok-bg); color: var(--ok); border: 1px solid color-mix(in srgb, var(--ok) 35%, transparent); }
+.pager { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 56px; }
+.pager a { border: 1px solid var(--line); border-radius: 10px; padding: 14px 18px; color: var(--text); }
+.pager a:hover { border-color: var(--accent); text-decoration: none; }
+.pager a small { display: block; color: var(--muted); font-size: 12.5px; }
+.pager a.next { text-align: right; grid-column: 2; }
+.ui { font-weight: 600; color: var(--accent); }
+footer { margin-top: 40px; font-size: 13px; color: var(--muted); }
+
+/* Lightbox */
+.lightbox { position: fixed; inset: 0; z-index: 50; background: rgba(0,0,0,.82); display: none; align-items: center; justify-content: center; padding: 24px; cursor: zoom-out; }
+.lightbox.on { display: flex; }
+.lightbox img { max-width: 100%; max-height: 100%; border-radius: 8px; box-shadow: 0 10px 40px rgba(0,0,0,.6); }
+
+@media (max-width: 1180px) { .wrap { grid-template-columns: 250px minmax(0, 1fr); } aside.toc { display: none; } main { padding: 30px 36px 70px; } }
+@media (max-width: 820px) {
+  .wrap { grid-template-columns: minmax(0, 1fr); }
+  nav.side { position: fixed; left: 0; top: 60px; width: 280px; z-index: 30; transform: translateX(-100%); transition: transform .2s; box-shadow: var(--shadow); }
+  nav.side.open { transform: none; }
+  .menu-btn { display: grid; }
+  main { padding: 24px 16px 60px; }
+  .brand small, .brand .name { display: none; }
+  .top { gap: 10px; padding: 0 12px; }
+  h1 { font-size: 1.7rem; }
+  .pager { grid-template-columns: 1fr; }
+  .pager a.next { grid-column: 1; }
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <button class="icon-btn menu-btn" id="menuBtn" aria-label="Menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+  <a class="brand" href="#introduction"><span class="mark">N</span><span class="name">NexBot</span> <small>User Guide</small></a>
+  <div class="search">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+    <input id="q" type="search" placeholder="Search the guide…" autocomplete="off">
+    <div class="results" id="results"></div>
+  </div>
+  <button class="icon-btn" id="themeBtn" aria-label="Light or dark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></button>
+</header>
+
+<div class="wrap">
+<nav class="side" id="side">
+  <h4>Getting started</h4>
+  <a href="#introduction"><span class="dot"></span>Introduction</a>
+  <a href="#quick-start"><span class="dot"></span>Quick start</a>
+  <a href="#server"><span class="dot"></span>Server</a>
+  <h4>World</h4>
+  <a href="#map"><span class="dot"></span>Map</a>
+  <a href="#script"><span class="dot"></span>Script</a>
+  <a href="#autotrade"><span class="dot"></span>AutoTrade</a>
+  <h4>Character</h4>
+  <a href="#character"><span class="dot"></span>Character</a>
+  <a href="#attack"><span class="dot"></span>Attack</a>
+  <a href="#training"><span class="dot"></span>Training area</a>
+  <a href="#protection"><span class="dot"></span>Protection</a>
+  <a href="#town"><span class="dot"></span>Town</a>
+  <a href="#inventory"><span class="dot"></span>Inventory</a>
+  <a href="#pet"><span class="dot"></span>Pet</a>
+  <a href="#pickfilter"><span class="dot"></span>Pick filter</a>
+  <a href="#alchemy"><span class="dot"></span>Alchemy</a>
+  <h4>Social</h4>
+  <a href="#party"><span class="dot"></span>Party</a>
+  <a href="#guild"><span class="dot"></span>Guild</a>
+  <a href="#academy"><span class="dot"></span>Academy</a>
+  <a href="#players"><span class="dot"></span>Players</a>
+  <h4>Selling</h4>
+  <a href="#stall"><span class="dot"></span>Stall</a>
+  <h4>Automation</h4>
+  <a href="#conditions"><span class="dot"></span>Conditions</a>
+  <a href="#sound"><span class="dot"></span>Sound</a>
+  <h4>Reference</h4>
+  <a href="#log"><span class="dot"></span>Log</a>
+  <a href="#item-codes"><span class="dot"></span>Item codes</a>
+  <a href="#troubleshooting"><span class="dot"></span>Troubleshooting</a>
+</nav>
+
+<main id="main">
+
+<!-- ======================================================================= -->
+<section class="page" id="introduction" data-title="Introduction">
+<div class="crumb">Getting started</div>
+<h1>Introduction</h1>
+<p class="lead">NexBot is a Silkroad Online bot that runs with the game window or without it (clientless). This guide explains every page of the program, one page at a time.</p>
+
+<figure><img src="@@server@@" alt="The NexBot window on the Server page"><figcaption>The NexBot window: the menu on the left, the page in the middle, the status bar at the bottom.</figcaption></figure>
+
+<h2 id="intro-window">The window</h2>
+<ul>
+  <li><b>Menu (left).</b> Every feature has its own page. Click a name to open it.</li>
+  <li><b>Page (middle).</b> Most pages have three panels: a list on the left, settings in the middle and actions or results on the right.</li>
+  <li><b>Status bar (bottom).</b> Shows the bot state (Idle, Running…), the mode (client or clientless), the proxy, the character and the server version.</li>
+  <li><b>State light (top right).</b> Shows at a glance whether the bot is idle or running.</li>
+</ul>
+
+<h2 id="intro-saving">Settings are saved by themselves</h2>
+<p>Everything you change is saved right away to <code>settings.json</code> next to <code>NexBot.exe</code>. There is no Save button. Copy this file to move your settings to another PC or another NexBot folder.</p>
+<div class="hint info"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v5h1"/></svg><div><p>The password is stored encrypted with your Windows account. A <code>settings.json</code> copied to another PC keeps every setting, but you have to type the password again there.</p></div></div>
+
+<h2 id="intro-pages">What each page does</h2>
+<div class="cards">
+  <a class="card" href="#server"><b>Server</b><span>Client folder, login, start and stop</span></a>
+  <a class="card" href="#map"><b>Map</b><span>World map, training area, nearby list</span></a>
+  <a class="card" href="#character"><b>Character</b><span>Stats, skills, auto mastery</span></a>
+  <a class="card" href="#inventory"><b>Inventory</b><span>Equipment, bag, auto sort</span></a>
+  <a class="card" href="#pet"><b>Pet</b><span>Attack pet: summon, heal, revive</span></a>
+  <a class="card" href="#pickfilter"><b>Pick filter</b><span>Pick, store, sell, drop and gold</span></a>
+  <a class="card" href="#script"><b>Script</b><span>Record and walk routes</span></a>
+  <a class="card" href="#autotrade"><b>AutoTrade</b><span>Trade runs with transport and suit</span></a>
+  <a class="card" href="#party"><b>Party</b><span>Invites, leaders, party matching</span></a>
+  <a class="card" href="#players"><b>Players</b><span>Nearby players and tracing</span></a>
+  <a class="card" href="#stall"><b>Stall</b><span>Sell items to other players</span></a>
+  <a class="card" href="#alchemy"><b>Alchemy</b><span>Plus, white and blue stones</span></a>
+  <a class="card" href="#conditions"><b>Conditions</b><span>If … then … rules</span></a>
+  <a class="card" href="#sound"><b>Sound</b><span>Alerts for game events</span></a>
+</div>
+</section>
+
+<!-- ======================================================================= -->
+<section class="page" id="quick-start" data-title="Quick start">
+<div class="crumb">Getting started</div>
+<h1>Quick start</h1>
+<p class="lead">From a fresh download to a character in the game in five steps.</p>
+
+<ol class="steps">
+  <li><strong>Choose the Silkroad client folder</strong>Open <span class="ui">Server</span>, click <span class="ui">Browse</span> and select the folder that contains <code>sro_client.exe</code> and <code>Media.pk2</code>.</li>
+  <li><strong>Read the server config</strong>Click <span class="ui">Read server config</span>. NexBot reads the version, locale, gateway port and divisions from <code>Media.pk2</code> and fills <span class="ui">Division</span> and <span class="ui">Gateway</span>.</li>
+  <li><strong>Build the database (once per client)</strong>Click <span class="ui">Build database</span>. NexBot reads items, skills, monsters, teleports and map names from the client into <code>Database.sqlite3</code>. When it is done, <span class="ui">Database</span> shows <i>ready</i> and the date. Build it again only after the client is updated.</li>
+  <li><strong>Fill in Auto Login</strong>Type the username and password, then pick the <span class="ui">Server</span> and <span class="ui">Character</span>. Leave <span class="ui">Log in automatically</span> and <span class="ui">Select the character automatically</span> on.</li>
+  <li><strong>Start</strong>Click <span class="ui">Start client</span> to play with the game window, or <span class="ui">Start clientless</span> to run without it. The status bar changes from <i>Idle</i>, and the character appears on the Server, Character and Map pages.</li>
+</ol>
+
+<figure><img src="@@server@@" alt="Server page"><figcaption>Server page after <b>Read server config</b> and <b>Build database</b>.</figcaption></figure>
+
+<div class="hint ok"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg><div><p><b>Tip:</b> start with the game window first. Once the character is in the game, click <span class="ui">Go clientless</span>. The window closes and the character stays online, using far less CPU and memory.</p></div></div>
+</section>
+
+<!-- ======================================================================= -->
+<section class="page" id="server" data-title="Server">
+<div class="crumb">Getting started</div>
+<h1>Server</h1>
+<p class="lead">Connect NexBot to your Silkroad client and server, log in and start or stop the bot.</p>
+<figure><img src="@@server@@" alt="Server page"><figcaption>The Server page.</figcaption></figure>
+
+<h2 id="server-client">Client &amp; Server</h2>
+<table><thead><tr><th>Setting</th><th>What it does</th></tr></thead><tbody>
+<tr><td>Silkroad client folder</td><td>The game folder (it has <code>sro_client.exe</code> and <code>Media.pk2</code>). Use <span class="ui">Browse</span> to choose it.</td></tr>
+<tr><td>Read server config</td><td>Reads the version, locale, gateway port and divisions from <code>Media.pk2</code>. This also runs by itself every time NexBot opens.</td></tr>
+<tr><td>Build database</td><td>Builds <code>Database.sqlite3</code> (items, skills, monsters, NPCs, teleports, map names). The Character, Inventory, Map, Stall and Alchemy pages need it.</td></tr>
+<tr><td>Division / Gateway</td><td>The division and gateway server to connect to. Most private servers have one of each.</td></tr>
+<tr><td>Server (info)</td><td><b>Version</b>, <b>Locale</b>, <b>Gateway port</b>, <b>Database</b> (ready + build date) and <b>Proxy</b> (the local port the game connects to while the bot runs).</td></tr>
+</tbody></table>
+
+<h2 id="server-login">Auto Login</h2>
+<table><thead><tr><th>Setting</th><th>What it does</th></tr></thead><tbody>
+<tr><td>Username / Password</td><td>Your game account. The password is saved encrypted.</td></tr>
+<tr><td>Server</td><td>The shard (game server) name. The list fills after the first login, or you can type the name.</td></tr>
+<tr><td>Character</td><td>The character to select. You can type the name too.</td></tr>
+<tr><td>Captcha</td><td>Only for servers that ask for an image code at login.</td></tr>
+<tr><td>Log in automatically</td><td>Sends the username and password by itself.</td></tr>
+<tr><td>Select the character automatically</td><td>Picks the character above after login.</td></tr>
+<tr><td>Stay online (clientless) when the client closes</td><td>If you close the game window, the character stays in the game, controlled by NexBot.</td></tr>
+</tbody></table>
+
+<h2 id="server-bot">Bot</h2>
+<table><thead><tr><th>Button</th><th>What it does</th></tr></thead><tbody>
+<tr><td>Start client</td><td>Opens <code>sro_client</code> through the NexBot loader. NexBot sits between the game and the server, so it can see and send game packets.</td></tr>
+<tr><td>Start clientless</td><td>Logs in without the game window. Lowest CPU and memory use.</td></tr>
+<tr><td>Go clientless</td><td>Closes the game window and keeps the character online.</td></tr>
+<tr><td>Stop</td><td>Disconnects and stops everything.</td></tr>
+<tr><td>Show the game window</td><td>Hides or shows the game window while it runs (it keeps running when hidden).</td></tr>
+</tbody></table>
+<p>Below the three panels, <span class="ui">Activity</span> shows the most important log lines across the whole width. HP, MP, EXP, gold and position are on the Map page and the Character page.</p>
+</section>
+
+<!-- ======================================================================= -->
+<section class="page" id="map" data-title="Map">
+<div class="crumb">World</div>
+<h1>Map</h1>
+<p class="lead">A live world map with your character, monsters, players and NPCs. It also sets the training area.</p>
+<figure><img src="@@map@@" alt="Map page"><figcaption>The Map page: the world map on the left, your character and the nearby list on the right.</figcaption></figure>
+
+<h2 id="map-use">Using the map</h2>
+<table><thead><tr><th>Action</th><th>Result</th></tr></thead><tbody>
+<tr><td>Left-click</td><td>The character walks to that spot.</td></tr>
+<tr><td>Drag</td><td>Look around (the map stops following the character).</td></tr>
+<tr><td>Mouse wheel / − +</td><td>Zoom out or in.</td></tr>
+<tr><td>Center on me</td><td>Follow the character again.</td></tr>
+<tr><td>Right-click</td><td>Opens the map menu (below).</td></tr>
+</tbody></table>
+<p>Colored dots mark players, monsters, uniques, NPCs, teleports, your pet or horse and party members. Use the map with the game window or clientless: it reads the minimap pictures from the client folder.</p>
+
+<h2 id="map-menu">Right-click menu</h2>
+<ul>
+  <li><b>Walk here</b>: walk to the clicked spot.</li>
+  <li><b>Center on me</b>: follow the character.</li>
+  <li><b>Set training area here</b>: puts a circle training area at the clicked spot, with the radius from <span class="ui">Area radius</span>.</li>
+  <li><b>Use the polygon as training area</b>: uses the recorded polygon instead of the circle.</li>
+  <li><b>Clear the training area</b>.</li>
+</ul>
+
+<h2 id="map-area">Training area: circle or polygon</h2>
+<p>The training area is where the character will fight. A <b>circle</b> is a center and a radius (5 to 1000). A <b>polygon</b> follows any shape, such as one side of a river or the area between two walls.</p>
+<ol class="steps">
+  <li><strong>Record polygon</strong>Click <span class="ui">Record polygon</span>.</li>
+  <li><strong>Click the corners</strong>Click the corners on the map clockwise, one by one.</li>
+  <li><strong>Stop recording</strong>Click <span class="ui">Stop recording</span>. A polygon needs at least 3 corners. <span class="ui">Clear</span> removes it, and the circle is used again.</li>
+</ol>
+<div class="hint info"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v5h1"/></svg><div><p>The <a href="#attack">hunting bot</a> (Attack page) attacks the monsters inside the training area.</p></div></div>
+
+<h2 id="map-nearby">Character and Nearby</h2>
+<p>The <span class="ui">Character</span> card shows HP, MP and EXP bars plus session statistics. <span class="ui">Nearby</span> lists everything around you with its distance. Double-click a line to walk to it.</p>
+</section>
+
+<!-- ======================================================================= -->
+<section class="page" id="script" data-title="Script">
+<div class="crumb">World</div>
+<h1>Script</h1>
+<p class="lead">Record a route once, then let NexBot walk it again. Teleports and return scrolls are recorded too.</p>
+<figure><img src="@@script@@" alt="Script page"><figcaption>The Script page: the recorder, the script lines and the route on the map.</figcaption></figure>
+
+<h2 id="script-record">Recording a route</h2>
+<ol class="steps">
+  <li><strong>Press ● Record</strong>Then walk in the game, or click the map to walk.</li>
+  <li><strong>Walk the route</strong>A point is added every <i>N</i> units walked (set <span class="ui">A point every</span>) and wherever the character stops. Teleporters and return scrolls you use become lines too.</li>
+  <li><strong>Add waits</strong><span class="ui">+ Wait 3 s</span> adds a pause, for example in front of an NPC.</li>
+  <li><strong>Press ■ Stop, then Save…</strong>Scripts are plain text files. <span class="ui">Open…</span> loads one, and <span class="ui">Clear</span> starts over.</li>
+</ol>
+
+<h2 id="script-walk">Walking a script</h2>
+<p>Press <span class="ui">▶ Start walking</span>. NexBot starts at the script point nearest the character (or at line 1) and uses the teleports and return scrolls on the way. Turn on <span class="ui">Loop at the end</span> to start over when the script ends.</p>
+
+<h2 id="script-format">Script lines</h2>
+<table><thead><tr><th>Line</th><th>Meaning</th></tr></thead><tbody>
+<tr><td><code>MOVE,x,y</code></td><td>Walk to a world position. Dungeons use <code>MOVE,region,x,y,z</code>.</td></tr>
+<tr><td><code>WAIT,ms</code></td><td>Wait this many milliseconds.</td></tr>
+<tr><td><code>TELEPORT,npc,id,label</code></td><td>Use a gate, ferry or teleport NPC near the character.</td></tr>
+<tr><td><code>RETURN</code></td><td>Use a return scroll.</td></tr>
+<tr><td><code>RIDE[,item]</code> / <code>DISMOUNT</code></td><td>Get on the transport or a mount / get off.</td></tr>
+<tr><td><code>BUY,npc,target,tab,slot,qty,times,talk</code></td><td>Buy from an NPC into the <code>TRANSPORT</code> or the <code>INVENTORY</code>.</td></tr>
+<tr><td><code>SELL,npc,target,qty,talk</code></td><td>Sell the transport's cargo or an item to an NPC.</td></tr>
+<tr><td><code>VISIT,kind</code></td><td>Stop and do the town business (storage, repair, sell, buy) with the NPC standing here.</td></tr>
+<tr><td><code>REPEAT</code></td><td>Start the script again from the top.</td></tr>
+</tbody></table>
+<div class="hint info"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v5h1"/></svg><div><p>phBot scripts work as they are: <code>walk,x,y,z</code> is a point, <code>DoStorage</code>, <code>DoBlacksmith</code>, <code>DoStable</code>, <code>DoGroceryTrader</code>, <code>DoHerbalist</code> … are stops at those NPCs, and <code>wait,ms</code> waits. <code>DoScript</code> needs nothing: the training script set on the Town page is walked after the town script. Add a phBot town script on the Town page like any other.</p></div></div>
+<pre><code>MOVE,6435,1080
+MOVE,6470,1102
+TELEPORT,STORE_CH_GATE,2,Jangan → Donwhang
+WAIT,3000
+MOVE,3554,2070
+RETURN</code></pre>
+</section>
+
+<!-- ======================================================================= -->
+<section class="page" id="autotrade" data-title="AutoTrade">
+<div class="crumb">World</div>
+<h1>AutoTrade</h1>
+<p class="lead">Trade runs: wear the trader suit, ride the transport, buy at the specialty trader, walk to the next town and sell, again and again.</p>
+<figure><img src="@@autotrade@@" alt="AutoTrade page"><figcaption>The AutoTrade page.</figcaption></figure>
+
+<h2 id="trade-transport">Transport and trader suit</h2>
+<ul>
+  <li><b>Trade transport</b>: transports that can carry trade goods. Click one to prefer it for <code>RIDE,TRANSPORT</code>. Click it again to use any transport you have.</li>
+  <li><b>Trader suit</b>: trader flags and bags this character can wear. Click one to prefer it. Otherwise any trader suit in the bag is used.</li>
+  <li><b>Transport</b>: buttons to <span class="ui">Wear suit</span>, <span class="ui">Ride transport</span> and <span class="ui">Get off</span> by hand, plus the list of what the transport carries.</li>
+</ul>
+
+<h2 id="trade-loops">Trade loops</h2>
+<p>Each loop is a script from the <a href="#script">Script</a> page that goes from one town to the next: ride the transport, buy at the specialty trader, walk, sell. For example: <i>Jangan → Donwhang</i>, then <i>Donwhang → Hotan</i>. Loops run in list order. Use <span class="ui">Add…</span>, <span class="ui">Remove</span>, <span class="ui">Up</span> and <span class="ui">Down</span> to arrange them.</p>
+
+<h2 id="trade-goods">Trade goods</h2>
+<p>Pick a trader to see its goods. Tick the goods to buy and set how many. <span class="ui">How much a buy line buys</span> sets the amount per <code>BUY</code> line.</p>
+
+<h2 id="trade-options">Trade options</h2>
+<table><thead><tr><th>Option</th><th>What it does</th></tr></thead><tbody>
+<tr><td>Wear the trader suit before riding the transport</td><td>Puts the suit on first, so goods count as job trade.</td></tr>
+<tr><td>Repeat trade loops</td><td>Starts again at the first loop after the last one.</td></tr>
+<tr><td>Use return scroll after the loops complete</td><td>Goes back to town when finished.</td></tr>
+<tr><td>Attack spawned thieves</td><td>Fights thieves that spawn on the road. A rider cannot attack, so this only works when you don't stay on the transport.</td></tr>
+</tbody></table>
+<p>Press <span class="ui">Start trade</span> to begin and <span class="ui">Stop</span> to end.</p>
+</section>
+
+<!-- ======================================================================= -->
+<section class="page" id="character" data-title="Character">
+<div class="crumb">Character</div>
+<h1>Character</h1>
+<p class="lead">Stats, details and pets, plus the skill window with automatic mastery and skill leveling.</p>
+<figure><img src="@@character@@" alt="Character page"><figcaption>The Character page (shown before login; it fills once the character is in the game).</figcaption></figure>
+
+<h2 id="char-stats">Character, Details and Pets</h2>
+<p><span class="ui">Character</span> shows the name, level, race, the active <b>buffs</b> as icons (skill buffs and scroll or item effects, with the time left on each icon; hover for the game's buff card: name and level, duration, effects such as <i>Physical damage 20% Increase</i>, and the remaining time), the HP / MP / EXP / skill EXP bars and the stats (strength, intellect, free stat points, berserk, attack, defense, hit and parry rates). <span class="ui">Details</span> shows gold, skill points, job, PvP cape, murders, guild, location, riding and account. <span class="ui">Pets</span> lists summoned pets and mounts with HP and hunger.</p>
+
+<h2 id="char-skills">Skills</h2>
+<p>The middle panel looks like the in-game skill window. The <b>up</b> buttons learn the next skill level or raise a mastery. Hover a skill to see the next level's cost.</p>
+
+<h2 id="char-auto">Auto leveling</h2>
+<p>Right-click a skill or a mastery, or use <span class="ui">AUTO</span>, to mark it for automatic leveling. NexBot then spends skill points by itself whenever there are enough.</p>
+<table><thead><tr><th>Setting</th><th>What it does</th></tr></thead><tbody>
+<tr><td>Mastery</td><td>Raise the marked masteries automatically.</td></tr>
+<tr><td>Skills</td><td>Learn the next level of the marked skills automatically. With nothing marked: the skills the character already has.</td></tr>
+<tr><td>ALL SKILLS (on each mastery)</td><td>Click the <b>ALL SKILLS</b> tag next to a mastery's name in the skill window to auto every skill of that mastery only, with no right-clicking one by one. Other masteries keep their own choice. Locked skills wait. Turns Skills on too.</td></tr>
+<tr><td>Gap</td><td>Keep each mastery this many levels below the character level (0 = up to the character level).</td></tr>
+<tr><td>Keep SP</td><td>Never spend below this many skill points.</td></tr>
+</tbody></table>
+<p>The line above the switches says what auto leveling learns now, or why it waits (for example <i>Spear Lv. 40: Max (Lv. 40)</i> or <i>needs 12,000 SP</i>). Waiting reasons are also written to the Log.</p>
+<div class="hint info"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v5h1"/></svg><div><p>If the panel says <i>“This game database has no skill window layout”</i>, open <a href="#server">Server</a> and click <span class="ui">Build database</span> again.</p></div></div>
+</section>
+
+<!-- ======================================================================= -->
+<section class="page" id="attack" data-title="Attack">
+<div class="crumb">Character</div>
+<h1>Attack <span class="tag new">NEW</span></h1>
+<p class="lead">The hunting bot, in tabs: attack skills, buffs, party buffs, resurrect, healing, luring and the attack log. It hunts in the enabled <a href="#training">training area</a>.</p>
+<figure><img src="@@attack@@" alt="Attack page"><figcaption>The Attack tab: the skills of each monster type on the left, the options on the right. Start bot, Stop and Train here are over the tabs.</figcaption></figure>
+<p><span class="ui">Start bot</span> starts hunting. In town, the town loop runs first (shopping, storage) and then walks to the training area: on the training script, or on the map's routes when there is none. <span class="ui">Stop</span> stops it. <span class="ui">Train here</span> moves the enabled training area to where the character stands. The bot waits while a walking script, the trade route or the town loop moves the character.</p>
+<h2 id="attack-skills">Attack tab</h2>
+<ol class="steps">
+  <li><strong>Type</strong>Choose a <span class="ui">Monster type</span>: General, Champion, Giant, Party General, Party Champion, Party Giant, Unique, Titan, Strong, Elite or Event.</li>
+  <li><strong>Skills</strong>Double-click a learned skill (or select it and click <span class="ui">Add</span>). Type part of a name in <span class="ui">Search</span> to find it. The type's skills are cast in the list's order; <span class="ui">Up</span> / <span class="ui">Down</span> change it, a double-click removes one.</li>
+  <li><strong>Imbue</strong>Choose the <span class="ui">Imbue</span> for the type (Chinese). It is cast before the skill when it is not on.</li>
+</ol>
+<table><thead><tr><th>Option</th><th>What it does</th></tr></thead><tbody>
+<tr><td>Cast skills in order</td><td>One skill after the other (else always the first that is ready).</td></tr>
+<tr><td>Kill steal monsters</td><td>Also attacks monsters other players fight (off: left alone 15 seconds after their last hit).</td></tr>
+<tr><td>Don't attack monsters</td><td>Only buffs, heals, resurrects and lures (a support character).</td></tr>
+<tr><td>Protect party members</td><td>Monsters attacking your party first (or one member, by name).</td></tr>
+<tr><td>Attack lower monsters first</td><td>Of the monsters attacking you, the weakest type first.</td></tr>
+<tr><td>Switch monster after X DOT</td><td>After this many damage-over-time skills on a monster, the next monster is attacked (the DOTs keep working).</td></tr>
+<tr><td>Use lower skills if a type has none</td><td>Giant → Champion → General, Party Giant → Party Champion → Party General → General, Unique → Titan → Giant.</td></tr>
+<tr><td>Slower attack mode / Lagtastic</td><td>Slower: waits longer between skills, for laggy servers. Lagtastic: shorter waits and the common attack sent again sooner.</td></tr>
+<tr><td>Auto select nearby uniques / titans</td><td>While the bot is stopped, selects a unique or titan that comes near (you attack it yourself).</td></tr>
+<tr><td>Use teleport skills</td><td>Ghost Walk / Teleport to a monster that is far (the ground-cast packet is not confirmed on vSRO 1.188).</td></tr>
+<tr><td>Attack range</td><td>How far from the character monsters are attacked.</td></tr>
+</tbody></table>
+<p>Which monster: those attacking you, then those attacking your party, then the <a href="#protection">monster preferences</a>, then the nearest; only inside the training area (attackers anywhere). With <i>Collision detection</i> (<a href="#training-collision">Training area</a>), monsters behind walls are left out. A monster that takes no damage for 20 seconds, or refuses 4 attacks, is left alone for a minute. With no monster, the bot walks around inside the area (or to its middle, with <i>Don't walk around</i>) and picks up drops (<a href="#pickfilter">Pick filter</a>).</p>
+<h2 id="attack-buffs">Buffs tab</h2>
+<figure><img src="@@attack-buffs@@" alt="Buffs tab"><figcaption>Learned buffs, the buffs to keep on and the emergency buffs.</figcaption></figure>
+<p>A buff is cast when it is not on, it is ready and there is enough MP. <span class="ui">Emergency buffs</span> are cast when HP or MP is under the percentage, or more monsters attack than the number. <span class="ui">Switch weapons for buffs</span> puts on a fitting weapon from the bag for a buff that needs one, then the first weapon again. <span class="ui">Use Devil's Spirit</span> keeps the devil avatar's buff on: cast it once yourself in the game first, so the bot learns which skill your devil has (a skill the character does not have gets it disconnected, so the bot never guesses). <span class="ui">Force Cure</span> cures a bad status with your cure skill. <span class="ui">Recast all buffs when one ends</span> casts the whole list again. A refused buff is tried again after 30 seconds.</p>
+<h2 id="attack-partybuffs">Party Buffs tab</h2>
+<figure><img src="@@attack-partybuffs@@" alt="Party Buffs tab"></figure>
+<p>Choose a buff, then the players to keep it on (party members or names). The bot walks to a player in the <span class="ui">Party buffing radius</span>, casts the buff on them and, with <span class="ui">Walk back</span>, goes back to the middle of the area. <span class="ui">Buff all nearby players</span> buffs everyone near; <span class="ui">Start / stop if a player is near</span> buffs only while one of the listed names is near.</p>
+<h2 id="attack-resurrect">Resurrect tab</h2>
+<figure><img src="@@attack-resurrect@@" alt="Resurrect tab"></figure>
+<p>Dead players of the list (or all party members) in the <span class="ui">Resurrect radius</span> are resurrected after the delay, with your resurrect skill (a group resurrect when several are dead), up to the try limit each. <span class="ui">Auto accept res</span> answers yes when another player resurrects you (optionally only party members).</p>
+<h2 id="attack-healing">Healing tab</h2>
+<figure><img src="@@attack-healing@@" alt="Healing tab"></figure>
+<p>Add your heal skills. First yourself when your HP is under <i>Heal self</i>, then a group heal when the average HP of you and the living members is under <i>Group heal</i>, then the member with the lowest HP under <i>Heal party member</i>. Party HP comes from the game in 10% steps.</p>
+<h2 id="attack-lure">Lure tab</h2>
+<figure><img src="@@attack-lure@@" alt="Lure tab"></figure>
+<p>For parties: one character walks out (a random way, or along a script's points), casts the skill at the edge (Howling Shout ...) and walks back, with the delays at the edge and the center. Luring stops while too many party members are dead, too many party giants / champions or monsters are in the area, or party members are away. Turn on <i>Don't attack monsters</i> to only lure.</p>
+<h2 id="attack-log">Attack Log tab</h2>
+<p>Every player who attacked or killed you this session (Job Cave, PKers), newest first, with the damage. <span class="ui">Clear</span> empties it. The bot's own targets, buffs, heals and resurrects are on the Log page as <i>Attack: ...</i>.</p>
+<div class="hint info"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v5h1"/></svg><div><p>Not in vSRO 1.188, shown greyed out: Mirror Reflect. The ground-cast packet (teleport skills) is not confirmed on this server: watch the log the first time.</p></div></div>
+</section>
+
+<!-- ======================================================================= -->
+<section class="page" id="training" data-title="Training area">
+<div class="crumb">Character</div>
+<h1>Training area <span class="tag new">NEW</span></h1>
+<p class="lead">A list of training areas, one enabled; which one to use at which level; collision, settings and the walk to the area.</p>
+<figure><img src="@@training@@" alt="Training area page"><figcaption>The Training Area tab: the list of areas (★ = enabled) with the buttons over it.</figcaption></figure>
+<ol class="steps">
+  <li><strong>Add</strong>Stand where you want to train and click <span class="ui">Add</span>, or <span class="ui">Get Position</span> for the selected area (also: right-click the <a href="#map">Map</a> → <i>Set training area here</i>).</li>
+  <li><strong>Edit</strong>Change the name, radius and pick radius in the list. <span class="ui">Use Polygon</span> uses the polygon drawn on the Map instead of the circle; <span class="ui">Use Radius</span> goes back to the circle.</li>
+  <li><strong>Script</strong><span class="ui">Change Script</span> sets the walking script from town to this area (recorded on the Script page). With no script, the bot walks there on the map's routes.</li>
+  <li><strong>Enable</strong>Double-click a row or click <span class="ui">Enable</span>: it becomes the area the bot hunts in and walks to. <span class="ui">Walk</span> walks there now, <span class="ui">Stop</span> stops.</li>
+</ol>
+<p>The <b>pick radius</b> is how far from the character drops are picked up.</p>
+<h2 id="training-conditions">Conditions</h2>
+<figure><img src="@@training-conditions@@" alt="Conditions tab"></figure>
+<p>Pairs of a level and an area: at that level (or higher, until the next pair) the bot enables that area and goes there. Example: level 1 Jangan, level 40 Donwhang.</p>
+<h2 id="training-collision">Collision</h2>
+<table><thead><tr><th>Option</th><th>What it does</th></tr></thead><tbody>
+<tr><td>Enable collision detection</td><td>Monsters and drops behind a wall (on the map data) are left out.</td></tr>
+<tr><td>Navigate around obstacles</td><td>Walking inside the area goes around walls on the map's routes.</td></tr>
+<tr><td>Navigate to item drops</td><td>Walking to a drop follows a route around walls.</td></tr>
+</tbody></table>
+<p>These need the map data (Server page). The town and NPC teleport options are greyed out.</p>
+<h2 id="training-settings">Settings</h2>
+<figure><img src="@@training-settings@@" alt="Settings tab"></figure>
+<table><thead><tr><th>Option</th><th>What it does</th></tr></thead><tbody>
+<tr><td>Don't walk around</td><td>Waits in the middle of the area when no monster is there.</td></tr>
+<tr><td>Use a repair hammer</td><td>When an equipped item's durability is under the percentage.</td></tr>
+<tr><td>Reverse return scroll when you die / after returning</td><td>After the town loop, teleports back to where you died, or to where the return scroll was used, instead of walking (packet not confirmed on vSRO 1.188).</td></tr>
+<tr><td>Use monster summon scrolls</td><td>When the area is empty; optionally only after the strong monsters are dead.</td></tr>
+<tr><td>Use speed drugs</td><td>Keeps a speed scroll on (optionally only while walking the script).</td></tr>
+</tbody></table>
+<h2 id="training-script">Script</h2>
+<table><thead><tr><th>Option</th><th>What it does</th></tr></thead><tbody>
+<tr><td>Skip town script entirely</td><td>After returning, goes straight to the training walk.</td></tr>
+<tr><td>Return when can't continue script</td><td>A training walk that fails sends the character back to town (Protection) to try again.</td></tr>
+<tr><td>Script walk delay</td><td>Waits this many ms at every point of the script.</td></tr>
+<tr><td>Go back a coordinate if stuck</td><td>Stuck for this many seconds: walks back one point, then on.</td></tr>
+<tr><td>Return if stuck</td><td>Stuck for this many seconds: returns to town.</td></tr>
+</tbody></table>
+<div class="hint info"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v5h1"/></svg><div><p>Not in vSRO 1.188 or not built, shown greyed out: treasure boxes, easter egg NPCs, equip better items, flowers, berserk / Energy of Life potions, Pandora's Box, fellow pet, remount in caves, Statue of Justice and NPC teleports.</p></div></div>
+</section>
+
+<!-- ======================================================================= -->
+<section class="page" id="protection" data-title="Protection">
+<div class="crumb">Character</div>
+<h1>Protection <span class="tag new">NEW</span></h1>
+<p class="lead">Keeps the character alive and safe: potions and pills, returning to town, reviving, stat points and disconnect rules.</p>
+<figure><img src="@@protection@@" alt="Protection page"><figcaption>The Potions tab: potions and pills on the left, scrolls and stats on the right.</figcaption></figure>
+<p>The page has four tabs: <span class="ui">Potions</span> (potions, pills, scrolls, stats), <span class="ui">Return to town</span>, <span class="ui">Dead and pet</span> (dead, pet return, misc) and <span class="ui">Berserk and monsters</span>.</p>
+<p>Most rows are a <b>switch</b> and a <b>number</b>. The number is only used while the switch is on.</p>
+
+<h2 id="prot-potions">Potions and pills</h2>
+<table><thead><tr><th>Setting</th><th>What it does</th></tr></thead><tbody>
+<tr><td>HP / MP potion</td><td>Drinks a potion when HP or MP drops below the percent.</td></tr>
+<tr><td>Vigor potion (HP / MP)</td><td>Drinks a vigor potion (it heals both) below its own percent. Set it lower than the normal potion, for emergencies.</td></tr>
+<tr><td>Universal pill</td><td>Cures a bad status: frozen, burnt, poisoned, shocked …</td></tr>
+<tr><td>Abnormal state pill</td><td>Used for a bad status when no universal pill is in the bag.</td></tr>
+<tr><td>Delay between two potions</td><td>The shortest time between two potions of the same kind. When the server answers that a potion's cooldown is not over (error 0x185B, for example with mall potion bags), the bot waits 250 ms longer each time, up to 5 seconds more, by itself. A potion the server refuses for another reason is skipped for 60 seconds while other stacks of the kind are used.</td></tr>
+</tbody></table>
+<p>Potions and pills work all the time the character is in the game, with the window or clientless. Potions are found by the game's own item type, so every size (small to XL) is used.</p>
+
+<h2 id="prot-stats">Stats</h2>
+<p><span class="ui">Add stat points automatically</span> spends free stat points by itself. <span class="ui">Each level's 3 points</span> chooses the split: 3 STR, 2 STR · 1 INT, 1 STR · 2 INT, or 3 INT. <span class="ui">+1 STR</span> and <span class="ui">+1 INT</span> add one point by hand.</p>
+
+<h2 id="prot-return">Return to town</h2>
+<figure><img src="@@protection-return@@" alt="Return to town tab"><figcaption>The Return to town tab: supplies and durability on the left, time and other reasons on the right.</figcaption></figure>
+<p>When a checked reason becomes true, NexBot stops what it is doing and uses a return scroll: any return scroll in the bag, an instant one first (not the bandit den scroll). Without a return scroll it only stops and writes a warning in the log. The reasons are checked <b>while the bot is busy</b> (walking a script, trading or, later, hunting) and, with <span class="ui">Also check when not botting (outside towns)</span> on, whenever you are outside a town. You count as in town when a shop NPC is near; after leaving town the checks wait 10 seconds. The log shows <code>Protection: return-to-town checks on</code> / <code>paused</code>.</p>
+<p><span class="ui">Check now</span> lists every return option that is on, its value right now and whether it would send you back (<b>[RETURN]</b>). "Not attacked" and "Every N minutes" count only while the checks are on.</p>
+<table><thead><tr><th>Reason</th><th>When</th></tr></thead><tbody>
+<tr><td>HP / MP potions left ≤</td><td>This many potions or fewer are left.</td></tr>
+<tr><td>Out of universal pills / vigors / speed scrolls / Energy of Life</td><td>None are left.</td></tr>
+<tr><td>Out of arrows / bolts</td><td>The weapon is a bow (arrows) or crossbow (bolts) and none are left, in the bag or equipped. Every attack counts one arrow down, like the game does.</td></tr>
+<tr><td>Free inventory slots ≤</td><td>The bag is (almost) full. Keep at least 2 free for drops.</td></tr>
+<tr><td>Durability below</td><td>The weapon, the shield or any armor piece is almost broken.</td></tr>
+<tr><td>Change the weapon if broken</td><td>Wears another weapon of the same kind from the bag instead of returning.</td></tr>
+<tr><td>Minutes before the next hour</td><td>For events that start on the hour.</td></tr>
+<tr><td>Every (minutes) / Every day at</td><td>On a timer, or once a day at a time (24-hour clock, e.g. 21:30).</td></tr>
+<tr><td>Return and disconnect every (minutes)</td><td>Goes back to town, then leaves the game.</td></tr>
+<tr><td>Fewer players in the party than</td><td>The party got too small.</td></tr>
+<tr><td>Not attacked for (minutes)</td><td>Nothing hit the character for a while (stuck, or the area is empty).</td></tr>
+<tr><td>A unique spawns near you</td><td>Leaves before the unique gets close.</td></tr>
+<tr><td>The job transport dies / Pink status</td><td>Job safety.</td></tr>
+</tbody></table>
+<div class="hint info"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v5h1"/></svg><div><p>With <a href="#town">Town</a> set up, the town loop then buys supplies and walks back to training.</p></div></div>
+
+<h2 id="prot-dead">Dead</h2>
+<figure><img src="@@protection-dead@@" alt="Dead and pet tab"><figcaption>The Dead and pet tab: dead on the left, pet return and misc on the right.</figcaption></figure>
+<p><span class="ui">Revive in town after (minutes)</span> waits that long for someone to resurrect you, then revives in town. <span class="ui">Right away when dead outside the training area</span> skips the wait when you died outside the <a href="#map-area">training area</a>. <span class="ui">Use a resurrection scroll instead</span> revives where you died when a resurrection scroll is in the bag; if you are still dead 15 seconds later, you go to town.</p>
+
+<h2 id="prot-scrolls">Scrolls</h2>
+<p>Type parts of scroll names (for example <i>speed</i>, <i>damage increase</i>, <i>damage absorption</i>, <i>HP+</i>, <i>hit</i>, <i>evasion</i>) and press <span class="ui">Add</span>. Each scroll is used again when its buff is gone, while botting and / or while not botting. The first use teaches NexBot which buff the scroll gives.</p>
+
+<h2 id="prot-pet">Pet return</h2>
+<p>Go back to town when out of pet recovery kits, grass of life, HGP potions or pet abnormal state potions.</p>
+
+<h2 id="prot-misc">Misc</h2>
+<table><thead><tr><th>Setting</th><th>What it does</th></tr></thead><tbody>
+<tr><td>Stop the bot after deaths &gt;</td><td>Stops scripts, trade and alchemy after more deaths than this in one session.</td></tr>
+<tr><td>Disconnect if a GM spawns</td><td>Leaves the game when a game master appears near you.</td></tr>
+<tr><td>Disconnect if a player attacks you while botting</td><td>–</td></tr>
+<tr><td>Disconnect on murder status</td><td>Leaves the game if the character becomes a murderer (red name).</td></tr>
+<tr><td>Disconnect after (minutes in game)</td><td>Leaves the game after this long.</td></tr>
+<tr><td>Re-spawn the job transport if it dies</td><td>Summons a new transport from the bag.</td></tr>
+<tr><td>Stop if a thief player is in town</td><td>Stops the bot when a player in thief job mode is near you in town (auto trade).</td></tr>
+</tbody></table>
+
+<h2 id="prot-berserk">Berserk and monster preferences</h2>
+<figure><img src="@@protection-more@@" alt="Berserk and monster preferences"><figcaption>The Berserk and monsters tab.</figcaption></figure>
+<p>When the berserk gauge is full (5 / 5), NexBot turns berserk on:</p>
+<table><thead><tr><th>Option</th><th>What it does</th></tr></thead><tbody>
+<tr><td>On these monster types</td><td>When you hit, or are hit by, a monster of one of the ticked types: General, Champion, Giant, Titan, Strong, Elite, Unique, Party. Tick as many as you want. A party monster counts as its type too (a party giant is a Giant), and <i>Party</i> means any party monster.</td></tr>
+<tr><td>When more monsters attack than</td><td>When more monsters than the number hit you in the last 10 seconds.</td></tr>
+<tr><td>While walking the script</td><td>Whenever a walking script runs.</td></tr>
+</tbody></table>
+<p>The log says why, for example <i>berserk (fighting Mangyang (Giant))</i>.</p>
+<h3>Monster preferences</h3>
+<p>A list of monster types and exact monsters, most wanted first. The higher one is in the list, the more the <a href="#attack">hunting bot</a> prefers it.</p>
+<ol class="steps">
+  <li><strong>Type</strong>Choose <i>Type</i> in <span class="ui">Add a monster by</span>, pick a type (General, Champion, Giant ...) and click <span class="ui">Add</span>.</li>
+  <li><strong>Name</strong>Choose <i>Name</i>, type part of a monster's name (Mangyang, Tiger, Chakji ...) and press Enter or <span class="ui">Search</span>. Right-click a result and choose <i>Add to the preferences</i>, or double-click it. This adds that exact monster, by its ID in the game data (e.g. <i>MOB_CH_TIGER</i>).</li>
+  <li><strong>Order</strong>Select an entry and use <span class="ui">Up</span> and <span class="ui">Down</span>, or right-click it to move it or remove it.</li>
+</ol>
+<p><b>Switch monster based on position in the list</b>: while attacking a monster, the hunting bot switches to a more preferred one that comes near (not when the one attacked is attacking you).</p>
+</section>
+
+<!-- ======================================================================= -->
+<section class="page" id="town" data-title="Town">
+<div class="crumb">Character</div>
+<h1>Town <span class="tag new">NEW</span></h1>
+<p class="lead">The town loop: sell junk, repair, buy potions and scrolls up to your amounts, then walk back to training.</p>
+<figure><img src="@@town@@" alt="Town page"><figcaption>The Town page: the buy list, the town scripts and the options.</figcaption></figure>
+
+<h2 id="town-how">How the town loop works</h2>
+<ol class="steps">
+  <li><strong>Arrive in town</strong>Protection uses a return scroll, or you use one yourself in the game (or revive in town). With <span class="ui">Run the town loop after returning to town</span> on, the loop starts after the teleport. <span class="ui">Run now</span> starts it by hand.</li>
+  <li><strong>Walk the town script</strong>NexBot picks the town script with a point near the character, so one script per town is enough. With no script near the character, the town loop does not move: record one for each town you use.</li>
+  <li><strong>Visit the shops on the way</strong>Every shop NPC within about 30 m of the route that has something to do is visited. NexBot sells first, then repairs (blacksmith / armor shop), then buys.</li>
+  <li><strong>Walk to training</strong>When the town script ends, the training script is walked, if one is set. <span class="ui">Loop the training script</span> keeps walking it.</li>
+</ol>
+
+<h2 id="town-scripts">Recording a town script</h2>
+<p>Use the <a href="#script">Script</a> page. Use a return scroll, then press <span class="ui">● Record</span> and walk from where you appear, past the potion seller, the blacksmith and the grocery, to the town gate. Save it, for example as <code>Jangan town.txt</code>, and add it with <span class="ui">Add…</span>. Record the walk from the gate to your training spot as a second script and set it under <span class="ui">Then walk to training</span>.</p>
+<div class="hint ok"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg><div><p>You don't need BUY or SELL lines in the town script. Walking close to the NPCs is enough, and the town loop does the shopping from the buy list.</p></div></div>
+
+<h2 id="town-buy">Buy list</h2>
+<p>Type part of an item name and press <span class="ui">Search</span> (or Enter). <span class="ui">All</span> lists everything any NPC sells, <span class="ui">Mine</span> shows your list, and <span class="ui">Reset</span> clears it. Tick <b>On</b> and type <b>Keep</b>: how many to have after buying. What is already in the bag counts, so with Keep 200 and 30 potions in the bag, 170 are bought.</p>
+
+<h2 id="town-options">Options</h2>
+<table><thead><tr><th>Option</th><th>What it does</th></tr></thead><tbody>
+<tr><td>Run the town loop after returning to town</td><td>Starts the loop by itself after a return scroll or a revive in town, by Protection or by you in the game (not while a script or the trade route walks).</td></tr>
+<tr><td>Repair at the blacksmith / armor shop</td><td>Repairs every damaged item there.</td></tr>
+<tr><td>Only repair the worn equipment</td><td>Repairs only what the character wears.</td></tr>
+<tr><td>Sell excess potions, arrows and bolts</td><td>Sells what is over the buy list's amounts.</td></tr>
+<tr><td>Stop if the inventory is full when buying</td><td>Stops the loop and the bot when the bag is full.</td></tr>
+<tr><td>Sell these items</td><td>Parts of names (e.g. <i>BONE</i>, <i>TAIL</i>) sold at the first shop on the way. A part matches at the start of a word: <i>HAT</i> matches "Carnival Hat" but not "Global chatting". Items on the buy list or the storage list are never sold by this list.</td></tr>
+<tr><td>Drop these items</td><td>Parts of names dropped on the ground when the town loop starts (after the return scroll, before walking). Items on the buy list or the storage list are never dropped.</td></tr>
+<tr><td>Put these items in storage</td><td>Parts of names put into the storage when the town script passes a Storage-keeper (within about 30 m of the route). They go onto a stack of the same item when they fit, otherwise into the first empty slot. Items on the buy list are never stored.</td></tr>
+</tbody></table>
+</section>
+
+<!-- ======================================================================= -->
+<section class="page" id="inventory" data-title="Inventory">
+<div class="crumb">Character</div>
+<h1>Inventory</h1>
+<p class="lead">Equipment, avatar and bag, with icons and item details, and the exchange window, even when clientless.</p>
+<figure><img src="@@inventory@@" alt="Inventory page"><figcaption>The Inventory page.</figcaption></figure>
+<ul>
+  <li><b>Move</b>: drag an item onto another slot, including equipment and avatar slots.</li>
+  <li><b>Use / wear</b>: right-click or double-click to use potions and scrolls, wear equipment or take it off.</li>
+  <li><b>Details</b>: point at an item and a card like the game's opens at the mouse: name, sort of item and level, the item's description (for example <i>A bag of 1,000 potions that can heal 570 HP pts. each.</i>), magic options, durability and quantity. With a database built with this version (Server, <span class="ui">Build database</span>) it also shows the game's <b>How To Use</b> and <b>Restriction</b> parts and values such as <i>MP recovery[820]</i>, and items bought in the item mall appear in the bag right away.</li>
+  <li><b>3D view</b>: in game, the <span class="ui">3D view</span> button under the equipment opens your character's 3D model from the game client. Drag to turn it, use the mouse wheel to zoom and double-click to reset. Your character stands and plays the game's own idle animation, wearing your armor and avatar, with your weapon in hand (in its stance) and your shield on the arm. It changes when you change equipment.</li>
+  <li><b>Animated slots</b>: like in the game, the scroll of a pet that is summoned now glows on and off, and rare items (Seal of Star, Moon, Sun) have a light circling the slot.</li>
+  <li><b>Equipment cards</b>: worn items, avatar items and equipment in the bag get the game's full card: sort of item, mounting part and degree (orange), the white stats with how well each one rolled (for example <i>Phy. def. pwr. 2.2 (+0%)</i>, <i>Durability 40/44 (+0%)</i>, attack, parry, block, reinforce, absorption), the magic options (blue), then required level, gender, race, <i>Max No. of magic options</i> and <i>Able to use Advanced elixir</i>. The stats need a database built with this version.</li>
+  <li><b>Character card</b>: between the equipment slots you see your character's face portrait from the game in a gold frame, your name, level and race, and your main stats (attack, defense, hit rate, parry, STR / INT). The Character page shows the same portrait next to your name. Not in game, a crest is shown instead.</li>
+  <li><b>Split a stack</b>: hold <b>Shift</b> while you drag a stack onto an empty slot (or onto the same item). A window asks how many to move (1, Half, All but 1, or type a number).</li>
+  <li><b>Global message</b>: right-click a global chatting item, or click <span class="ui">Global</span> under the bag. Write the message (up to 100 characters) and press Send; one item is used.</li>
+  <li><b>Auto sort</b>: stacks matching items and orders the bag. <span class="ui">Stop</span> cancels it.</li>
+  <li><b>Refresh</b>: reads the inventory and equipment again at once and retries item pictures that did not load.</li>
+</ul>
+
+<h2 id="inv-exchange">Exchange</h2>
+<p>The right panel is the game's exchange window. It works clientless too, and with the game open it shows the same exchange as the game's window.</p>
+<ol class="steps">
+  <li><strong>Start</strong>Pick a player in <span class="ui">Player nearby</span> and click <span class="ui">Exchange</span>. When someone asks you, <span class="ui">Accept</span> and <span class="ui">Refuse</span> show instead (for 30 seconds), and the log says who asked.</li>
+  <li><strong>Put items and gold in</strong>Drag items from the bag onto <span class="ui">Your items</span> (the whole stack goes in; split it first for less). Or <b>Alt + click</b> a bag item: it goes into the next empty exchange slot. Items in the window get a gold frame in the bag. To take one out, Alt + click it, right-click it, or drag it back to the bag. Type the gold and click <span class="ui">Set gold</span>.</li>
+  <li><strong>See theirs</strong><span class="ui">Their items</span> shows what the other player puts in, with their gold. Point at an item for its full card: stats, blues and plus.</li>
+  <li><strong>Confirm, then Approve</strong><span class="ui">Confirm</span> locks your side. When both sides confirmed, the button becomes <span class="ui">Approve</span>. The exchange ends when both approve. <span class="ui">Cancel</span> closes it at any time.</li>
+</ol>
+<table><thead><tr><th>Option</th><th>What it does</th></tr></thead><tbody>
+<tr><td>Auto accept exchange requests</td><td>Accepts other players' exchange requests by itself, a second after they come. It only accepts. Putting items in, Confirm and Approve stay with you.</td></tr>
+<tr><td>Accept while botting</td><td>Also accepts while the bot is busy: walking a script, the trade route or the town loop. Off: requests that come then wait for you.</td></tr>
+<tr><td>Accept in town only</td><td>Accepts only in a town (a shop NPC near). On by default.</td></tr>
+</tbody></table>
+<p>A request that isn't accepted by itself shows <span class="ui">Accept</span> and <span class="ui">Refuse</span>, and the log says why it was left for you.</p>
+<div class="hint info"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v5h1"/></svg><div><p>The log keeps every exchange packet (<i>Exchange packet ...</i>). If something looks wrong, copy those lines.</p></div></div>
+</section>
+
+<!-- ======================================================================= -->
+<section class="page" id="pet" data-title="Pet">
+<div class="crumb">Character</div>
+<h1>Pet <span class="tag new">NEW</span></h1>
+<p class="lead">Your summoned pets, and an attack pet that is summoned, healed, fed and revived for you.</p>
+<figure><img src="@@pet@@" alt="Pet page"><figcaption>The Pet page: summoned pets on the left, the attack pet options in the middle, the grab pet on the right.</figcaption></figure>
+
+<h2 id="pet-list">Pets</h2>
+<p>The list shows every pet you have out: attack pet (level, HP and HGP bars, passive or not), grab pet (items it holds), horse and transport. Select one and click <span class="ui">Unsummon</span> to send it back into its scroll. Get off a mount before you unsummon it.</p>
+
+<h2 id="pet-preferred">Preferred pets</h2>
+<p>Under the pets you see every attack pet in the game, the ones in your bag marked <b>IN BAG</b> (and <b>DEAD</b> when their scroll is dead). Click pets in the order you want them: the first becomes <b>PET 1</b>, the next <b>PET 2</b>, and so on. Click one again to take it off, or <span class="ui">Clear order</span> to start over.</p>
+<p>When the attack pet has to be summoned, NexBot goes down the order: PET 1 is summoned if it is in the bag, or revived first if it is dead (when auto revive may). If PET 1 isn't in the bag, or is dead and can't be revived, it tries PET 2, and so on. With none of them in the bag, any attack pet in the bag is used.</p>
+
+<h2 id="pet-grab">Grab pet</h2>
+<p>The right column shows the <b>grab pet's bag</b>: every item it holds, with how full it is (for example <i>12 / 56</i>). It is read when the pet is summoned and kept up to date while the pet picks items into its own bag. Under it, <b>Picked up this session</b> lists every item and every pile of gold picked up, newest first: the time, the item (with its kind, for example <i>Gold Ring (European, Seal of Sun)</i>), how many, and who picked it up (the character, the grab pet, or the grab pet into its own bag). Point at an item to see its card. What gets picked up is set on the <a href="#pickfilter">Pick filter</a> page.</p>
+
+<h2 id="pet-attack">Attack pet</h2>
+<table><thead><tr><th>Option</th><th>What it does</th></tr></thead><tbody>
+<tr><td>Use attack pet</td><td>Turns on everything below. Off: NexBot leaves the attack pet alone.</td></tr>
+<tr><td>Recovery kit when HP below (%)</td><td>Heals the pet with a pet recovery kit (the pet's HP potion). 0: never.</td></tr>
+<tr><td>HGP potion when HGP below (%)</td><td>Feeds the pet so it doesn't go hungry. 0: never.</td></tr>
+<tr><td>Auto summon attack pet</td><td>Summons the pet from its scroll whenever it isn't out, also right after it was revived.</td></tr>
+<tr><td>only in town / only at training area</td><td>Summons it only in a town (a shop NPC near), or only inside the training area set on the Map page.</td></tr>
+<tr><td>Auto revive attack pet, Times</td><td>Revives a dead pet with a pet revive item, up to this many times a session (0: no limit).</td></tr>
+<tr><td>only if HP potions are present</td><td>Revives only when there are recovery kits for the pet in the bag.</td></tr>
+<tr><td>Return to town when the attack pet dies</td><td>Uses a return scroll so the town loop can buy revive items.</td></tr>
+<tr><td>only if there aren't any revive items</td><td>Returns only when no revive item is left; otherwise the pet is revived. On by default. When the pet can't be revived or summoned 3 times in a row (while you are attacked, for example), it returns anyway.</td></tr>
+<tr><td>Don't attack monsters</td><td>Keeps the pet passive.</td></tr>
+</tbody></table>
+<div class="hint info"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v5h1"/></svg><div><p>Returning to town for the pet happens right away when the pet dies, whether a script runs or not (in town it does nothing). <b>Protect the attack pet</b> is not built yet. Fellow pets (SP recall) are not in vSRO 1.188. The log keeps the pet packets (<i>Pet packet ...</i>) in case something doesn't work on your server.</p></div></div>
+</section>
+
+<!-- ======================================================================= -->
+<section class="page" id="pickfilter" data-title="Pick filter">
+<div class="crumb">Character</div>
+<h1>Pick filter <span class="tag new">NEW</span></h1>
+<p class="lead">For every item in the game: pick it up, put it in the storage, sell it or drop it. Plus the gold you keep in the bag and in the storage.</p>
+<figure><img src="@@pickfilter@@" alt="Pick filter page"><figcaption>The Pick filter page: the items on the left, the options on the right.</figcaption></figure>
+
+<h2 id="pick-list">Items</h2>
+<ol class="steps">
+  <li><strong>Find the items</strong>Choose a group in the first box (weapons, Chinese armor, accessories, potions, alchemy stones, gold ...), then a degree and normal or rare (SoX) items. Or type part of a name and press <b>Enter</b>. The first choice, <i>Items set in the filter</i>, shows what you already set.</li>
+  <li><strong>Tick what to do</strong>Each item has <span class="ui">Pick</span>, <span class="ui">Store</span>, <span class="ui">Sell</span> and <span class="ui">Drop</span>. Point at an item to see its card.</li>
+  <li><strong>Set many at once</strong>Select several rows (Shift or Ctrl + click, Ctrl + A for all) and right-click: Pick, Store, Sell, Drop, Don't ..., or Clear. Clicking a column header turns that action on for every item shown (click again: off).</li>
+</ol>
+<p>Gold has three drops (small, medium and large piles). Set <span class="ui">Pick</span> on all three to pick up gold. <span class="ui">Clear</span> empties the list (the filter stays), <span class="ui">Update</span> shows the group again, and <span class="ui">Reset</span> erases the whole filter after asking.</p>
+<p>The town loop uses the filter along with the Town page's lists. Items marked <b>Store</b> go into the storage at the Storage-keeper, items marked <b>Sell</b> are sold at the first shop, and items marked <b>Drop</b> are dropped when the town loop starts. If an item is marked for more than one, it is stored before it is sold and sold before it is dropped. Items on the buy list are never sold, stored or dropped.</p>
+
+<h2 id="pick-options">Options</h2>
+<table><thead><tr><th>Option</th><th>What it does</th></tr></thead><tbody>
+<tr><td>Pick up items</td><td>Turns picking up on. The grab pet picks up whenever it is out. The character picks up only when no script, trade route or town loop is moving it, walking to each item by itself.</td></tr>
+<tr><td>Pick items first</td><td>While hunting: pick up the drops before the next monster (monsters attacking you still come first). Off: drops are picked up when no monster is left to attack.</td></tr>
+<tr><td>Use pick pet</td><td>The grab pet picks up instead of the character.</td></tr>
+<tr><td>Pick with character if pet is unsummoned or full</td><td>Without a grab pet out, or with its bag full, the character picks up.</td></tr>
+<tr><td>Pick other player's items</td><td>Also picks up items that belong to nobody: drops whose owner time ran out, or items players dropped.</td></tr>
+<tr><td>Pick party items</td><td>Also picks up items that dropped for a party member.</td></tr>
+<tr><td>Don't pick items</td><td>Picks up nothing, whatever the filter says.</td></tr>
+<tr><td>Only pick rare or blue items</td><td>Equipment is picked up only when it is rare (SoX) or blue. Other items follow the filter.</td></tr>
+<tr><td>Pick Arrows/Bolts, Up to</td><td>Picks up arrows (Chinese) or bolts (European) until the bag has this many.</td></tr>
+<tr><td>Allow selling of all item types</td><td>Rare (SoX) items are sold too. Off: they are never sold.</td></tr>
+<tr><td>Do not sell items with plus &gt;=</td><td>Keeps equipment with this plus or more. 0: off.</td></tr>
+<tr><td>Only store rare or blue items</td><td>Equipment is stored only when it is rare or blue. Otherwise it is sold, if marked to sell.</td></tr>
+<tr><td>Only store items with specific blue attributes</td><td>Equipment is stored only with one of the blue attributes in the list (parts of names: Str, Int, Durability ...).</td></tr>
+</tbody></table>
+
+<h2 id="pick-gold">Store gold</h2>
+<table><thead><tr><th>Option</th><th>What it does</th></tr></thead><tbody>
+<tr><td>Gold keep amount</td><td>The gold to keep in the bag.</td></tr>
+<tr><td>Take gold from storage</td><td>With less than the keep amount, takes the rest out of the storage at the Storage-keeper.</td></tr>
+<tr><td>Store gold in storage, Maximum amount</td><td>Puts the gold over the keep amount into the storage, up to the maximum in the storage (0: no limit).</td></tr>
+</tbody></table>
+<div class="hint info"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v5h1"/></svg><div><p>The grab pet picks up at any time; the character picks up when it is standing free, or between monsters while <a href="#attack">hunting</a>. An item that isn't picked up after 3 tries is left alone. The guild storage and dismantling are not in this version.</p></div></div>
+</section>
+
+<!-- ======================================================================= -->
+<section class="page" id="alchemy" data-title="Alchemy">
+<div class="crumb">Character</div>
+<h1>Alchemy <span class="tag new">NEW</span></h1>
+<p class="lead">Plus items with elixirs, lucky powder and stones, and add white (attribute) and blue (alchemic) stats, all from a queue.</p>
+<figure><img src="@@alchemy@@" alt="Alchemy page"><figcaption>The Alchemy page: items on the left, settings in the middle, the queue on the right.</figcaption></figure>
+
+<h2 id="alch-how">How it works</h2>
+<ol class="steps">
+  <li><strong>Pick an item</strong>The <span class="ui">Items</span> panel shows the equipment in your bag as slots, like the Inventory page (rare items glow). Click one to choose it; point at it to see its full item card.</li>
+  <li><strong>Choose the tab</strong><span class="ui">Plus</span> (elixirs), <span class="ui">Attribute</span> (white stones) or <span class="ui">Alchemic</span> (blue stones).</li>
+  <li><strong>Set the options and press Add</strong>The <span class="ui">Add</span> buttons are under the items. <span class="ui">Add all items</span> queues every item at once. Each queue line keeps the settings it was added with.</li>
+  <li><strong>Press Start</strong>The queue runs line by line. <span class="ui">Cancel</span> stops it, <span class="ui">Clear</span> empties it, and right-clicking a line deletes it.</li>
+</ol>
+
+<h2 id="alch-plus">Plus</h2>
+<table><thead><tr><th>Setting</th><th>What it does</th></tr></thead><tbody>
+<tr><td>Stop at +</td><td>The plus to reach. The line ends when the item gets there.</td></tr>
+<tr><td>Success / Failure delay (ms)</td><td>Pause after a success or a failure before the next elixir.</td></tr>
+<tr><td>Move on after a plus failure</td><td>Go to the next queued item after a failure instead of trying again.</td></tr>
+<tr><td>Stop all alchemy if an item is destroyed</td><td>Stops the whole queue when an item breaks.</td></tr>
+</tbody></table>
+
+<h3 id="alch-options">Use when the item is at this plus or higher</h3>
+<p>Each option is one row: a <b>check box</b> to turn it on, then <b>at +N</b>, the plus from which it is used. With the box checked and <i>at +3</i>, the option is used for every elixir once the item is +3 or more. <i>at +0</i> means from the start.</p>
+<table><thead><tr><th>Option</th><th>What it does</th></tr></thead><tbody>
+<tr><td>Lucky powder</td><td>Adds lucky powder to each elixir for a higher success chance. The list on the right picks the powder degree: <b>Auto</b> uses the item's degree, and <b>Deg 1–12</b> forces one degree (for servers with different powders).</td></tr>
+<tr><td>Astral stone</td><td>Adds the astral option before plussing. It protects the plus when an elixir fails. The exact effect depends on the server, so read the stone's in-game description.</td></tr>
+<tr><td>Steady stone</td><td>Adds the steady option (also protects the plus on failure, depending on the server).</td></tr>
+<tr><td>Immortal stone</td><td>Adds the immortal option (the item is not destroyed on failure).</td></tr>
+<tr><td>Lucky stone</td><td>Adds the lucky option.</td></tr>
+<tr><td>Stop after attempts</td><td>Stops an item after this many elixirs.</td></tr>
+<tr><td>Item degree (stones)</td><td><b>Auto</b> reads the degree from the item name. Pick a degree if your server changed them.</td></tr>
+</tbody></table>
+<div class="hint ok"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg><div><p>A stone is only added when the item doesn't already have that option, so it is not wasted on every elixir.</p></div></div>
+
+<h2 id="alch-attr">Attribute (white stones)</h2>
+<p>Select an item and an attribute stone, then set <span class="ui">Stop at white %</span>. The line stops when the stat reaches that percent. <span class="ui">Add all stones</span> queues every matching stone for the item. White % is read for the weapon, armor, shield and accessory stats the bot knows. For other stones it stops after one success.</p>
+
+<h2 id="alch-blue">Alchemic (blue stones)</h2>
+<p>Select an item and a magic stone, then set <span class="ui">Stop at blue value</span>. This is the option's number (e.g. STR <b>5</b>), not a percent. <span class="ui">Add all blues</span> queues every blue you have stones for.</p>
+<p><span class="ui">Use alchemy catalyst</span> adds a catalyst to each white or blue stone, so stones cannot fail.</p>
+
+<h2 id="alch-learn">Packet types (learned)</h2>
+<p>Servers can use different alchemy packet types. The line at the bottom of the queue (e.g. <i>elixir 3 · stone 4 · attribute 5</i>) shows what NexBot uses. Fuse one item yourself in the game client, and NexBot learns your server's values.</p>
+</section>
+
+<!-- ======================================================================= -->
+<section class="page" id="party" data-title="Party">
+<div class="crumb">Social</div>
+<h1>Party</h1>
+<p class="lead">Accept and send party invites, follow chosen leaders and use party matching.</p>
+<figure><img src="@@party@@" alt="Party page"><figcaption>The Party page.</figcaption></figure>
+
+<p>The <span class="ui">Party</span> panel shows the members like the game's party window: face portrait, name, level and guild, and red HP and blue MP bars. The master is marked with a gold star. Select a member and click <span class="ui">Kick selected</span> to remove them, or <span class="ui">Leave party</span> to leave.</p>
+
+<h2 id="party-invites">Invites</h2>
+<table><thead><tr><th>Setting</th><th>What it does</th></tr></thead><tbody>
+<tr><td>Accept party invites</td><td>Accepts invites from players on the <b>Accept / Invite list</b> (empty list: from anyone).</td></tr>
+<tr><td>Invite other players</td><td>Invites the players on the list when they are nearby.</td></tr>
+<tr><td>Party type</td><td>EXP and item sharing, and who may invite, for parties this character creates.</td></tr>
+<tr><td>Leave if the master is not in the leader list</td><td>Leaves parties led by anyone not on the <b>Party leader list</b> (empty: never leave).</td></tr>
+</tbody></table>
+
+<h2 id="party-matching">Party matching</h2>
+<ul>
+  <li><b>Auto form party matching (every 10 minutes)</b>: lists a party with your title and level range.</li>
+  <li><b>Accept players asking to join</b>: uses the accept rules above.</li>
+  <li><b>Join by name (master)</b> / <b>Join by title (contains)</b>: joins matching parties by themselves.</li>
+  <li><b>View matching</b> lists the open parties, and <b>Join selected</b> asks to join one.</li>
+</ul>
+<p>The member list shows your party. <span class="ui">Leave party</span> and <span class="ui">Kick selected</span> work as in the game.</p>
+</section>
+
+<!-- ======================================================================= -->
+<section class="page" id="guild" data-title="Guild">
+<div class="crumb">Social</div>
+<h1>Guild</h1>
+<p class="lead">Accept guild invites and invite players without a guild.</p>
+<figure><img src="@@guild@@" alt="Guild page"><figcaption>The Guild page.</figcaption></figure>
+<ul>
+  <li><b>Accept all guild invites</b>, or only from the names on the <b>Accept / Invite list</b>.</li>
+  <li><b>Auto invite players without a guild</b> when they come near. The list limits it to those names.</li>
+</ul>
+<div class="hint warn"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3 2 21h20L12 3z"/><path d="M12 10v5M12 18h.01"/></svg><div><p>Your guild is read when you log in: name and level, the number of members and how many are online, gathered GP, the master, and the notice. Members are listed with their face portrait, rank (the master has a gold star), level and online state. If a server sends the guild in another layout, the log says the member list was not understood: turn on <span class="ui">Show debug messages</span> on the Log page, log in, and send the <b>Guild data</b> line.</p></div></div>
+</section>
+
+<!-- ======================================================================= -->
+<section class="page" id="academy" data-title="Academy">
+<div class="crumb">Social</div>
+<h1>Academy</h1>
+<p class="lead">Accept academy invites, invite players and use a whisper password.</p>
+<figure><img src="@@academy@@" alt="Academy page"><figcaption>The Academy page.</figcaption></figure>
+<ul>
+  <li><b>Accept academy invites</b> from anyone, or from the list.</li>
+  <li><b>Invite players to the academy</b> who are on the list.</li>
+  <li><b>Password</b>: players who whisper this word to you are invited.</li>
+</ul>
+<div class="hint warn"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3 2 21h20L12 3z"/><path d="M12 10v5M12 18h.01"/></svg><div><p>Academy matching, graduation and the member list are not built yet. Their packets need a capture from your server.</p></div></div>
+</section>
+
+<!-- ======================================================================= -->
+<section class="page" id="players" data-title="Players">
+<div class="crumb">Social</div>
+<h1>Players</h1>
+<p class="lead">Every player around you, the gear they wear, quick invites and tracing (following another player).</p>
+<figure><img src="@@players@@" alt="Players page"><figcaption>The Players page.</figcaption></figure>
+
+<h2 id="players-list">Players nearby</h2>
+<p>The list shows each player's face portrait from the game, name, guild, estimated level and distance. Select a player, then use <span class="ui">Party invite</span>, <span class="ui">Guild invite</span>, <span class="ui">Union invite</span> or <span class="ui">Academy invite</span>. Levels are estimated from the gear the player wears, so they are not exact.</p>
+<p><span class="ui">Union invite</span> asks another guild's master to join your union. Only a guild master can send it, and the other player must be the master of a guild that is in no union.</p>
+
+<h2 id="players-gear">Equipment</h2>
+<p>The <span class="ui">Equipment</span> panel shows the selected player like your own character on the Inventory page. Their face portrait, name, estimated level and race sit in the middle. Their gear is in its slots around them: weapon, shield, head, shoulders, chest, gloves, pants, boots, earring, necklace, rings and job suit. <span class="ui">Avatar</span> switches to their avatar items. Under the portrait you see their guild, job, PK cape, state (normal, riding, stall, in combat) and distance. Point at an item for its card: sort, degree, requirements and description. Rare items glow.</p>
+<div class="hint info"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v5h1"/></svg><div><p>The server sends only what a player wears and its plus. Their bag, stat rolls, blues and durability are never sent to other players, so no bot can show them. To see a player's items in full, exchange with them (Inventory page).</p></div></div>
+
+<h2 id="players-trace">Trace</h2>
+<table><thead><tr><th>Setting</th><th>What it does</th></tr></thead><tbody>
+<tr><td>Player to trace</td><td>The name to follow (or select one in the list).</td></tr>
+<tr><td>Game trace</td><td>Uses the game's own trace command. When it's off, NexBot walks after the player itself.</td></tr>
+<tr><td>Walk again when further than (m)</td><td>How far the player may get before NexBot walks after them.</td></tr>
+</tbody></table>
+<p>Use <span class="ui">Start tracing</span> and <span class="ui">Stop tracing</span>.</p>
+<div class="hint info"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v5h1"/></svg><div><p>Attacking monsters and buffing while tracing are not built yet.</p></div></div>
+</section>
+
+<!-- ======================================================================= -->
+<section class="page" id="stall" data-title="Stall">
+<div class="crumb">Selling</div>
+<h1>Stall <span class="tag new">NEW</span></h1>
+<p class="lead">Open a stall with saved prices, keep it filled and see what was sold.</p>
+<figure><img src="@@stall@@" alt="Stall page"><figcaption>The Stall page: the open stall, the price list and the options.</figcaption></figure>
+
+<h2 id="stall-open">Opening a stall</h2>
+<ol class="steps">
+  <li><strong>Stand in a town, off the horse</strong>The game only allows stalls there.</li>
+  <li><strong>Set prices</strong>In <span class="ui">Prices</span>, turn items <b>On</b> and type a <b>Price / slot</b>.</li>
+  <li><strong>Type a Title and Note</strong>Players see them on the stall.</li>
+  <li><strong>Open stall</strong>NexBot opens the stall and fills it with every priced item. <span class="ui">Close stall</span> closes it.</li>
+</ol>
+
+<h2 id="stall-prices">Prices: Inventory and Filter</h2>
+<ul>
+  <li><b>Inventory</b> lists your items, one row per kind, with how many you <b>Have</b>.</li>
+  <li><b>Filter</b> lets you price any game item, even one not in the bag yet. Use it for things you farm.</li>
+  <li><b>Per slot</b>: 0 puts the whole stack in one slot. A number splits stacks into slots of that size, for example selling elixirs 10 at a time.</li>
+</ul>
+<p>In <span class="ui">Items for sale</span>, right-click a slot to change its price or remove it. Or type a price and use <span class="ui">Change price</span> / <span class="ui">Remove</span>.</p>
+
+<h2 id="stall-options">Options</h2>
+<table><thead><tr><th>Option</th><th>What it does</th></tr></thead><tbody>
+<tr><td>Auto stall</td><td>Opens the stall by itself when enough priced items are in the bag.</td></tr>
+<tr><td>Stall when at least (items)</td><td>How many slots must be fillable first (0 = whenever any item can be stalled).</td></tr>
+<tr><td>Fill again when sold out</td><td>When everything in the stall sold, it is filled again with the priced items left in the inventory (stacks are split again for "Per slot"). When none are left, or this is off, the stall closes by itself. This works for a stall you opened yourself too, not only with Auto stall.</td></tr>
+</tbody></table>
+<p><span class="ui">Sold this session</span> lists each sale: the item, how many, the price and the buyer.</p>
+<div class="hint warn"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3 2 21h20L12 3z"/><path d="M12 10v5M12 18h.01"/></svg><div><p><b>Items refused (error 0x3C2A)?</b> Your server uses a different stall layout. With the game window open, start a stall yourself and add <b>one</b> item. NexBot learns the layout from the game client and uses it from then on (the Log shows <i>“Stall packet from the game client”</i>).</p></div></div>
+</section>
+
+<!-- ======================================================================= -->
+<section class="page" id="conditions" data-title="Conditions">
+<div class="crumb">Automation</div>
+<h1>Conditions <span class="tag new">NEW</span></h1>
+<p class="lead">“If … then …” rules: when all checks of a rule become true, its actions run in order.</p>
+<figure><img src="@@conditions@@" alt="Conditions page"><figcaption>The Conditions page: rules on the left, the If checks in the middle, the Then actions on the right.</figcaption></figure>
+
+<h2 id="cond-rule">Making a rule</h2>
+<ol class="steps">
+  <li><strong>New rule</strong>Give it a <span class="ui">Name</span> and switch <span class="ui">Rule on</span>.</li>
+  <li><strong>Add checks (If)</strong>Pick a check, fill in its value, press <span class="ui">Add</span>. The rule acts only when <b>all</b> checks are true.</li>
+  <li><strong>Add actions (Then)</strong>Pick an action and press <span class="ui">Add</span>. Actions run top to bottom, and <span class="ui">Up</span> reorders them.</li>
+  <li><strong>Repeat every</strong>0 = act once each time the checks become true. A number repeats the actions every N seconds while they stay true.</li>
+</ol>
+<p>Rules run whenever the character is in the game: started, stopped, tracing or stalling.</p>
+
+<h2 id="cond-if">Checks (If)</h2>
+<table><thead><tr><th>Check</th><th>Value</th></tr></thead><tbody>
+<tr><td>HP below / MP below</td><td>Percent</td></tr>
+<tr><td>Free inventory slots below</td><td>Number of slots</td></tr>
+<tr><td>Fewer than N of an item</td><td>Item name (part) and count, e.g. fewer than 50 HP potions</td></tr>
+<tr><td>Gold above / Gold below</td><td>Gold</td></tr>
+<tr><td>Level N or more</td><td>Level</td></tr>
+<tr><td>The character is dead</td><td>–</td></tr>
+<tr><td>Player near / Any player near</td><td>Name (empty = any) and range in m (0 = any)</td></tr>
+<tr><td>A GM is near</td><td>–</td></tr>
+<tr><td>Unique near / Any unique near</td><td>Name and range</td></tr>
+<tr><td>Whisper containing / Any whisper</td><td>Text</td></tr>
+<tr><td>The stall sold out</td><td>–</td></tr>
+<tr><td>Not in a party</td><td>–</td></tr>
+</tbody></table>
+
+<h2 id="cond-then">Actions (Then)</h2>
+<table><thead><tr><th>Action</th><th>What it does</th></tr></thead><tbody>
+<tr><td>Log</td><td>Writes a message to the log.</td></tr>
+<tr><td>Play a sound / Play the alert sound</td><td>Plays a .wav file, or the Windows alert sound.</td></tr>
+<tr><td>Use a return scroll</td><td>Goes back to town.</td></tr>
+<tr><td>Whisper</td><td>Sends a private message.</td></tr>
+<tr><td>Wait</td><td>Pauses before the next action.</td></tr>
+<tr><td>Stop scripts, trade and alchemy</td><td>Stops whatever is running.</td></tr>
+<tr><td>Close the stall</td><td>–</td></tr>
+<tr><td>Leave the party</td><td>–</td></tr>
+<tr><td>Disconnect</td><td>Stops the bot.</td></tr>
+</tbody></table>
+
+<h2 id="cond-examples">Examples</h2>
+<ul>
+  <li><b>GM safety</b>: If <i>A GM is near</i> → Then <i>Play the alert sound</i>, <i>Stop scripts, trade and alchemy</i>, <i>Disconnect</i>.</li>
+  <li><b>Low potions</b>: If <i>Fewer than 20 of “HP_POTION”</i> → Then <i>Use a return scroll</i>.</li>
+  <li><b>Sold out</b>: If <i>The stall sold out</i> → Then <i>Whisper</i> your main character “stall empty”.</li>
+</ul>
+</section>
+
+<!-- ======================================================================= -->
+<section class="page" id="sound" data-title="Sound">
+<div class="crumb">Automation</div>
+<h1>Sound</h1>
+<p class="lead">Hear when something important happens, even while the game is hidden or clientless.</p>
+<figure><img src="@@sound@@" alt="Sound page"><figcaption>The Sound page.</figcaption></figure>
+<p>Turn on an event and press <span class="ui">File…</span> to choose a <code>.wav</code> file. With no file chosen, the Windows alert sound plays. The same event for the same player or monster rings at most once every 10 seconds. <span class="ui">Mute all sounds</span> silences everything.</p>
+<table><thead><tr><th>Event</th><th>When</th></tr></thead><tbody>
+<tr><td>GM spawned</td><td>A game master appears near you.</td></tr>
+<tr><td>Unique spawned</td><td>Any unique notice, or a unique appears near you.</td></tr>
+<tr><td>Titan spawned</td><td>A titan monster appears near you.</td></tr>
+<tr><td>Unique in range</td><td>A unique appears near you.</td></tr>
+<tr><td>Specific unique</td><td>A unique from your list appears (in-game notice). Names can be parts, e.g. <i>Uruchi</i>.</td></tr>
+<tr><td>Player died</td><td>Your character dies.</td></tr>
+<tr><td>Attacking another player</td><td>Your character hits another player.</td></tr>
+<tr><td>Attacked</td><td>Another player hits your character.</td></tr>
+<tr><td>Returning to town</td><td>A return scroll is used.</td></tr>
+<tr><td>Private message</td><td>Someone whispers you.</td></tr>
+<tr><td>Thief / Hunter nearby</td><td>A thief or hunter in job mode appears near you.</td></tr>
+<tr><td>Rare item drop</td><td>You pick up a rare (Seal) item.</td></tr>
+<tr><td>Transport died</td><td>Your job transport dies.</td></tr>
+</tbody></table>
+</section>
+
+<!-- ======================================================================= -->
+<section class="page" id="log" data-title="Log">
+<div class="crumb">Reference</div>
+<h1>Log</h1>
+<p class="lead">Everything the bot did, with times.</p>
+<figure><img src="@@log@@" alt="Log page"><figcaption>The Log page.</figcaption></figure>
+<table><thead><tr><th>Control</th><th>What it does</th></tr></thead><tbody>
+<tr><td>Clear logs</td><td>Empties the log (every kind of line) and the Activity box.</td></tr>
+<tr><td>Show</td><td><b>Normal logs</b>: what the bot does (no packets, no debug lines). <b>Warnings and errors</b>: only those. <b>Packet logs</b>: the packet lines in hex (<code>S&gt;C 0xB074 [0200]</code> …). <b>Debug logs</b>: the technical lines. <b>Everything</b>: all of them. Switching shows the earlier lines of that kind again (the last 6000 are kept); debug lines are only kept while Debug logs or Everything is chosen. The choice is saved.</td></tr>
+<tr><td>Search</td><td>Only lines that contain the text (any case), for example <i>Attack:</i> or <i>Protection:</i>.</td></tr>
+<tr><td>Save to file</td><td>Saves the lines shown now to a text file, with dates and WARN / ERROR / DEBUG marks, to send to the developer.</td></tr>
+</tbody></table>
+<p>The <a href="#server">Server</a> page's Activity box shows only the normal lines and has its own <span class="ui">Clear</span>.</p>
+</section>
+
+<!-- ======================================================================= -->
+<section class="page" id="item-codes" data-title="Item codes">
+<div class="crumb">Reference</div>
+<h1>Item codes</h1>
+<p class="lead">Server names of common alchemy items, used in the Stall Filter, Conditions checks and the log. <code>NN</code> is the degree (01–12).</p>
+<table><thead><tr><th>Item</th><th>Code</th></tr></thead><tbody>
+<tr><td>Weapon elixir</td><td><code>ITEM_ETC_ARCHEMY_REINFORCE_RECIPE_WEAPON_A</code> (also <code>_B</code> and <code>EVENT</code> versions)</td></tr>
+<tr><td>Armor / shield / accessory elixir</td><td><code>ITEM_ETC_ARCHEMY_REINFORCE_RECIPE_ARMOR_A</code>, <code>…_SHIELD_A</code>, <code>…_ACCESSARY_A</code></td></tr>
+<tr><td>Lucky powder</td><td><code>ITEM_ETC_ARCHEMY_REINFORCE_PROB_UP_A_NN</code> (e.g. degree 11: <code>…_PROB_UP_A_11</code>)</td></tr>
+<tr><td>Lucky stone</td><td><code>ITEM_ETC_ARCHEMY_MAGICSTONE_LUCK_NN</code></td></tr>
+<tr><td>Steady stone</td><td><code>ITEM_ETC_ARCHEMY_MAGICSTONE_SOLID_NN</code></td></tr>
+<tr><td>Astral stone</td><td><code>ITEM_ETC_ARCHEMY_MAGICSTONE_ASTRAL_NN</code></td></tr>
+<tr><td>Immortal stone</td><td><code>ITEM_ETC_ARCHEMY_MAGICSTONE_ATHANASIA_NN</code></td></tr>
+<tr><td>Attribute (white) stones</td><td><code>ITEM_ETC_ARCHEMY_ATTRSTONE_…_NN</code></td></tr>
+</tbody></table>
+<p>An equipment item's degree is the first number in its code. For example, <code>ITEM_CH_SWORD_11_A</code> is degree 11.</p>
+</section>
+
+<!-- ======================================================================= -->
+<section class="page" id="troubleshooting" data-title="Troubleshooting">
+<div class="crumb">Reference</div>
+<h1>Troubleshooting</h1>
+<p class="lead">Common problems and how to fix them.</p>
+
+<h2 id="ts-map">The map is empty</h2>
+<p>Select the client folder on <a href="#server">Server</a> and click <span class="ui">Read server config</span>. The minimap pictures come from the client.</p>
+
+<h2 id="ts-db">Items or skills show no names or icons</h2>
+<p>Click <span class="ui">Build database</span> on the Server page. Build it again after a client update.</p>
+
+<h2 id="ts-stall">The stall refuses items (error 0x3C2A)</h2>
+<p>Open a stall in the game client and add one item yourself. NexBot learns the layout (see <a href="#stall">Stall</a>).</p>
+
+<h2 id="ts-powder">Lucky powder is not used</h2>
+<ul>
+  <li>Make sure the <b>Lucky powder</b> box is checked and the item is at the <b>at +</b> value or higher.</li>
+  <li>The powder's degree must match: <b>Auto</b> uses the item's degree. If your server's powders have other degrees, pick the degree yourself.</li>
+  <li>The log warns <i>“no lucky powder of degree N in the inventory”</i> when it can't find one.</li>
+</ul>
+
+<h2 id="ts-alchemy">Alchemy does nothing / the server refuses</h2>
+<p>Fuse one item yourself in the game client, so NexBot learns your server's alchemy packet types (see <a href="#alch-learn">Alchemy</a>).</p>
+
+<h2 id="ts-old">A new feature isn't in the window</h2>
+<p>NexBot must be closed while it is rebuilt. If it was open, you are still running the previous version.</p>
+<footer>NexBot User Guide · generated from the app's own screenshots.</footer>
+</section>
+
+<nav class="pager" id="pager"></nav>
+</main>
+
+<aside class="toc" id="toc"></aside>
+</div>
+
+<div class="lightbox" id="lightbox"><img alt=""></div>
+
+<script>
+(function () {
+  var pages = Array.prototype.slice.call(document.querySelectorAll("section.page"));
+  var links = Array.prototype.slice.call(document.querySelectorAll("nav.side a"));
+  var toc = document.getElementById("toc"), pager = document.getElementById("pager");
+  var side = document.getElementById("side");
+
+  // Headings get anchors.
+  pages.forEach(function (p) {
+    p.querySelectorAll("h2[id], h3[id]").forEach(function (h) {
+      var a = document.createElement("a"); a.className = "anchor"; a.href = "#" + h.id; a.textContent = "#"; h.appendChild(a);
+    });
+  });
+
+  function pageOf(id) {
+    var el = id && document.getElementById(id);
+    if (!el) return pages[0];
+    return el.classList.contains("page") ? el : (el.closest("section.page") || pages[0]);
+  }
+
+  function show() {
+    var id = decodeURIComponent(location.hash.slice(1));
+    var page = pageOf(id);
+    pages.forEach(function (p) { p.classList.toggle("on", p === page); });
+    links.forEach(function (a) { a.classList.toggle("on", a.getAttribute("href") === "#" + page.id); });
+    document.title = page.dataset.title + " · NexBot Guide";
+
+    // On this page
+    var hs = page.querySelectorAll("h2[id]");
+    toc.innerHTML = hs.length ? "<h5>On this page</h5>" : "";
+    hs.forEach(function (h) {
+      var a = document.createElement("a"); a.href = "#" + h.id; a.textContent = h.firstChild.textContent; toc.appendChild(a);
+    });
+
+    // Previous / next
+    var i = pages.indexOf(page), html = "";
+    if (i > 0) html += '<a class="prev" href="#' + pages[i - 1].id + '"><small>← Previous</small>' + pages[i - 1].dataset.title + "</a>";
+    if (i < pages.length - 1) html += '<a class="next" href="#' + pages[i + 1].id + '"><small>Next →</small>' + pages[i + 1].dataset.title + "</a>";
+    pager.innerHTML = html;
+    page.appendChild(pager);
+
+    side.classList.remove("open");
+    var target = id && document.getElementById(id);
+    if (target && target !== page) target.scrollIntoView(); else window.scrollTo(0, 0);
+    spy();
+  }
+
+  function spy() {
+    var page = document.querySelector("section.page.on");
+    var current = null;
+    page.querySelectorAll("h2[id]").forEach(function (h) { if (h.getBoundingClientRect().top < 120) current = h.id; });
+    toc.querySelectorAll("a").forEach(function (a) { a.classList.toggle("on", a.getAttribute("href") === "#" + current); });
+  }
+
+  window.addEventListener("hashchange", show);
+  window.addEventListener("scroll", spy, { passive: true });
+  show();
+
+  // Menu (phone)
+  document.getElementById("menuBtn").onclick = function () { side.classList.toggle("open"); };
+
+  // Theme
+  var root = document.documentElement;
+  try { var t = localStorage.getItem("nexbot-guide-theme"); if (t) root.dataset.theme = t; } catch (e) {}
+  document.getElementById("themeBtn").onclick = function () {
+    var dark = root.dataset.theme ? root.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+    root.dataset.theme = dark ? "light" : "dark";
+    try { localStorage.setItem("nexbot-guide-theme", root.dataset.theme); } catch (e) {}
+  };
+
+  // Lightbox
+  var box = document.getElementById("lightbox"), boxImg = box.querySelector("img");
+  document.addEventListener("click", function (e) {
+    if (e.target.matches("figure img")) { boxImg.src = e.target.src; box.classList.add("on"); }
+  });
+  box.onclick = function () { box.classList.remove("on"); };
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") { box.classList.remove("on"); results.style.display = "none"; }
+    if (e.key === "/" && document.activeElement !== q) { e.preventDefault(); q.focus(); }
+  });
+
+  // Search: page titles, headings and paragraphs.
+  var index = [];
+  pages.forEach(function (p) {
+    index.push({ id: p.id, title: p.dataset.title, page: p.dataset.title, text: p.textContent.toLowerCase() });
+    p.querySelectorAll("h2[id], h3[id]").forEach(function (h) {
+      var text = h.firstChild.textContent, body = "", n = h.nextElementSibling;
+      while (n && !/^H[23]$/.test(n.tagName)) { body += " " + n.textContent; n = n.nextElementSibling; }
+      index.push({ id: h.id, title: text, page: p.dataset.title, text: (text + " " + body).toLowerCase() });
+    });
+  });
+  var q = document.getElementById("q"), results = document.getElementById("results");
+  q.addEventListener("input", function () {
+    var term = q.value.trim().toLowerCase();
+    if (term.length < 2) { results.style.display = "none"; return; }
+    var hits = index.filter(function (e) { return e.text.indexOf(term) >= 0; })
+      .sort(function (a, b) { return (b.title.toLowerCase().indexOf(term) >= 0) - (a.title.toLowerCase().indexOf(term) >= 0); })
+      .slice(0, 12);
+    results.innerHTML = hits.length ? hits.map(function (h) {
+      return '<a href="#' + h.id + '">' + h.title.replace(/[<&]/g, "") + "<span>" + h.page + "</span></a>";
+    }).join("") : '<a><span>No results</span></a>';
+    results.style.display = "block";
+  });
+  q.addEventListener("keydown", function (e) {
+    if (e.key === "Enter") { var first = results.querySelector("a[href]"); if (first) { location.hash = first.getAttribute("href"); results.style.display = "none"; q.blur(); } }
+  });
+  results.addEventListener("click", function () { results.style.display = "none"; q.value = ""; });
+  document.addEventListener("click", function (e) { if (!e.target.closest(".search")) results.style.display = "none"; });
+})();
+</script>
+</body>
+</html>
